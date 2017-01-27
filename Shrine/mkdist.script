@@ -1,0 +1,40 @@
+wait	10000
+command	Del("::/Misc/Bible.TXT.Z");
+
+# Install distro branding, packaging & start-up
+put	::/Once.HC.Z	Shrine/Patched/Once.HC
+put	::/Adam/ADefine.HC.Z	Shrine/Patched/Adam/ADefine.HC
+put	::/Doc/Start.DD.Z	Shrine/Patched/Doc/Start.DD
+put	::/Misc/DoDistro.HC.Z	Shrine/Patched/Misc/DoDistro.HC
+put	::/Misc/PalUbuntu.HC.Z	Shrine/Branding/PalUbuntu.HC
+
+# Install system components
+command	MkDir("::/Adam/Net");
+put	::/Adam/Net/Http.HC.Z	Shrine/Adam/Net/Http.HC
+put	::/Adam/Net/SnailLib.HC.Z	Shrine/Adam/Net/SnailLib.HC
+put	::/Adam/Net/Url.HC.Z	Shrine/Adam/Net/Url.HC
+
+# Install apps
+put	::/Apps/Lsh.HC.Z	Shrine/Apps/Lsh.HC
+put	::/Apps/Mfa.HC.Z	Shrine/Apps/Mfa.HC
+put	::/Apps/Pkg.HC.Z	Shrine/Apps/Pkg.HC
+put	::/Apps/Wget.HC.Z	Shrine/Apps/Wget.HC
+
+# Build & download Shrine ISO
+command	#include "::/Misc/DoDistro";
+list	/Tmp/ShrineDist.ISO	Shrine-HEAD.iso
+
+# Build SnailNet package
+#command	MkDir("::/Tmp/snailnet");
+#command	CopyTree("::/Adam/Net", "::/Tmp/Net");
+command	RedSeaISO("::/Tmp/snailnet.ISO.C", "::/Adam/Net");
+list	/Tmp/snailnet.ISO.C	pkg-snailnet.ISO.C
+
+# Build Pkg package
+command	MkDir("::/Tmp/pkg");
+command	Copy("::/Apps/Pkg.HC.Z", "::/Tmp/pkg/Pkg.HC.Z");
+command	RedSeaISO("::/Tmp/pkg.ISO.C", "::/Tmp/pkg");
+list	/Tmp/pkg.ISO.C	pkg-pkg.ISO.C
+
+command	Reboot;
+wait	1000

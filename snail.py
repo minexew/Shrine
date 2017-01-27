@@ -1,0 +1,87 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import socket
+import struct
+import sys
+import time
+
+TCP_IP = '127.0.0.1'
+TCP_PORT = 7777
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect((TCP_IP, TCP_PORT))
+
+socks = []
+
+CMD_SOCKET = 1
+CMD_CLOSE = 2
+CMD_CONNECT_TCP = 3
+CMD_SEND = 4
+CMD_RECV = 5
+CMD_RECVALL = 6
+CMD_HELLO = 0xAA
+
+def recvall(sock, count):
+    s = b''
+    while len(s) < count:
+        s += sock.recv(count - len(s))
+    return s
+
+while True:
+    cmd = ord(sock.recv(1))
+    #print('%02X' % cmd)
+    if cmd is None: break
+
+    if cmd == CMD_HELLO:
+        print('hello!')
+        sock.send(b'\xAA')
+    elif cmd == CMD_CLOSE:
+        sockfd = ord(sock.recv(1))
+        print('close(%d)' % (sockfd))
+
+        socks[sockfd].close()
+        socks[sockfd] = None
+        sock.send(struct.pack('B', 0))
+    elif cmd == CMD_CONNECT_TCP:
+        sockfd, length = struct.unpack('BB', recvall(sock, 2))
+        hostname = recvall(sock, length)
+        port, = struct.unpack('H', recvall(sock, 2))
+        print('connectTcp(%d, %s, %d)' % (sockfd, hostname, port))
+
+        try:
+            socks[sockfd].connect((hostname, port))
+            rc = 0
+        except socket.error as e:
+            print(e)
+            rc = 0xff
+
+        sock.send(struct.pack('B', rc))
+    elif cmd == CMD_RECVALL:
+        sockfd, length, flags = struct.unpack('BBB', recvall(sock, 3))
+        #print('recvall(%d, %d, %d)' % (sockfd, length, flags))
+
+        try:
+            data = recvall(socks[sockfd], length)
+        except socket.error as e:
+            print(e)
+            data = b''
+
+        sock.send(struct.pack('B', len(data)))
+        sock.send(data)
+
+    elif cmd == CMD_SEND:
+        sockfd, length, flags = struct.unpack('BBB', recvall(sock, 3))
+        data = recvall(sock, length)
+        #print('send(%d, %s, %d)' % (sockfd, data, flags))
+
+        rc = socks[sockfd].send(data)
+        sock.send(struct.pack('B', rc))
+    elif cmd == CMD_SOCKET:
+        af, type = struct.unpack('BB', recvall(sock, 2))
+        id = len(socks)
+        print("socket(%d, %d)" % (af, type))
+
+        socks.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+        sock.send(struct.pack('B', id))

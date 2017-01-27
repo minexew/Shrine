@@ -1,0 +1,12 @@
+wait	5000
+
+# Upload unattended installation script onto RAMdisk
+put	B:/AutoOSInstall.HC	AutoOSInstall/AutoOSInstall.HC
+
+# Load & run
+command	#include "B:/AutoOSInstall"
+command	OSInstall(FALSE);
+
+# Reboot to flush file system
+command	Reboot;
+wait	3000

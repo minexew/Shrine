@@ -1,0 +1,80 @@
+diff --git a/isoparser/isoparser/iso.py b/isoparser/isoparser/iso.py
+index adab25a..99b5027 100644
+--- a/isoparser/isoparser/iso.py
++++ b/isoparser/isoparser/iso.py
+@@ -55,8 +55,9 @@ class ISO(object):
+             # In Rock Ridge mode, we can't use the path table
+             pivot = 0
+         else:
+-            path = [part.upper() for part in path]
+-            pivot = len(path)
++            #path = [part.upper() for part in path]
++            #pivot = len(path)
++            pivot = 0
+ 
+ 
+         # Resolve as much of the path as possible via the path table
+diff --git a/isoparser/isoparser/record.py b/isoparser/isoparser/record.py
+index 4cf19f3..5633bad 100644
+--- a/isoparser/isoparser/record.py
++++ b/isoparser/isoparser/record.py
+@@ -1,11 +1,14 @@
+ from . import susp, rockridge
+ 
++import struct
++
+ class Record(object):
+     def __init__(self, source, length, susp_starting_index=None):
+         self._source = source
+         self._content = None
+         target = source.cursor + length
+ 
++        self.file_record_start = source._start * 2048 + source.cursor
+         _                  = source.unpack('B')       # TODO: extended attributes length
+         self.location      = source.unpack_both('I')
+         self.length        = source.unpack_both('I')
+@@ -47,7 +50,7 @@ class Record(object):
+ 
+         self.embedded_susp_entries = susp_entries
+ 
+-        assert source.cursor <= target
++        #assert source.cursor <= target
+         source.unpack_raw(target - source.cursor)
+ 
+     def __repr__(self):
+@@ -192,5 +195,23 @@ class Record(object):
+         assert not self.is_directory
+         return self._source.get_stream(self.location, self.length)
+ 
++    def generate_patchset(self, data):
++        #print(self.file_record_start, self.location, self.length)
++
++        if len(data) > self.length:
++            raise Exception('File enlargement is currently not supported')
++
++        length_offset = self.file_record_start + 9
++
++        length_orig = struct.pack('<I', self.length) + struct.pack('>I', self.length)
++        length_new = struct.pack('<I', len(data)) + struct.pack('>I', len(data))
++
++        length_patch = (length_offset, length_orig, length_new)
++
++        content_offset = self.location * 2048
++        content_orig = self.content[0:len(data)]
++        content_new = data
+ 
++        content_patch = (content_offset, content_orig, content_new)
+ 
++        return [length_patch, content_patch]
+diff --git a/isoparser/isoparser/source.py b/isoparser/isoparser/source.py
+index 0ca52dc..60a170a 100644
+--- a/isoparser/isoparser/source.py
++++ b/isoparser/isoparser/source.py
+@@ -178,6 +178,7 @@ class Source(object):
+             fetch_needed(start_sector + fetch_sectors - need_start)
+ 
+         self._buff = self._buff[:length]
++        self._start = start_sector
+ 
+     def save_cursor(self):
+         return (self._buff, self.cursor)

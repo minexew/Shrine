@@ -1,0 +1,19 @@
+--- ../TempleOS/TempleOSCD/Misc/DoDistro.HC	2017-01-28 13:24:02.828951646 +0100
++++ Patched/Misc/DoDistro.HC	2017-01-28 14:20:27.738495134 +0100
+@@ -31,7 +31,7 @@
+   CopyTree("/Misc",	"/Distro/Misc");
+ 
+   //To save space, optionally delete dictionary.
+-  //Del("/Distro/Adam/AutoComplete/ACDefs.DATA");
++  Del("/Distro/Adam/AutoComplete/ACDefs.DATA");
+   CopyTree("/Linux","/Distro/Linux");	  //You can leave this out.
+   MkDir("/Distro/Tmp");
+   MkDir("/Distro/Tmp/ScrnShots");
+@@ -47,6 +47,6 @@
+   Free(out_iso_filename);
+ }
+ 
+-MakeMyISO("/Tmp/MyDistro.ISO");
++MakeMyISO("/Tmp/ShrineDist.ISO");
+ 
+ // Study my account examples $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOS/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOS/TOSDistro.HC,1"$.

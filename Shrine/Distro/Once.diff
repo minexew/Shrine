@@ -1,0 +1,15 @@
+--- ../TempleOS/TempleOSCD/Once.HC	2017-01-28 13:24:02.831951646 +0100
++++ Patched/Once.HC	2017-01-28 18:05:05.319237544 +0100
+@@ -1,3 +1,7 @@
++#include "::/Apps/Lsh";
++#include "::/Apps/Pkg";
++#include "::/Misc/PalUbuntu.HC"
++
+ //Place this file in /Home and change
+ //anything you want.
+ 
+@@ -53,3 +57,4 @@
+ }
+ 
+ Tmp;
++Lsh;
