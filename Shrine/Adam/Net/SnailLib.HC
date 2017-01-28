@@ -53,7 +53,7 @@ static U0 ReadBlock(I64 port, U8* buf, I64 count) {
 }
 
 I8 SnailInit() {
-  CommInit8n1(SNAIL_COM, 9600);
+  CommInit8n1(SNAIL_COM, 115200);
   CommBusyPutChar(SNAIL_COM, CMD_HELLO);
 
   I64 max_time = cnts.jiffies + SNAIL_TIMEOUT * JIFFY_FREQ / 1000;
@@ -99,8 +99,8 @@ I64 connectTcp(I64 sockfd, U8* addr, U16 port) {
 I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
   I64 total = 0;
 
-  while (len) {
-    I64 step = len;
+  while (total < len) {
+    I64 step = len - total;
 
     if (step > SNAIL_FRAME_SIZE)
       step = SNAIL_FRAME_SIZE;
@@ -111,14 +111,13 @@ I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
     CommBusyPutChar(SNAIL_COM, flags);
     I64 got = ReadI8();
 
-    if (got <= 0)
+    if (got < 0)
       return got;
+    else if (got == 0)
+      break;
 
-    ReadBlock(SNAIL_COM, buf, got);
-
-    len -= got;
+    ReadBlock(SNAIL_COM, buf + total, got);
     total += got;
-    buf += got;
   }
 
   return total;
@@ -155,24 +154,3 @@ I64 recvLine(I64 sock, U8* buffer, I64 size, I64 flags) {
 I64 sendString(I64 sockfd, U8* str, I64 flags) {
   return send(sockfd, str, StrLen(str), flags);
 }
-
-/*
-U0 SnailTest() {
-  SnailInit();
-  I64 sock = socket(AF_INET, SOCK_STREAM);
-  if (connectTcp(sock, "127.0.0.1", 8888)) {
-    "$FG,4$Connect failed!\n$FG$";
-    return;
-  }
-
-  U8* msg = "Yay nigga!\n";
-  send(sock, msg, StrLen(msg), 0);
-  U8 buf[12];
-  I64 len = recvall(sock, buf, 11, 0);
-  buf[len] = 0;
-  "" buf;
-  close(sock);
-}
-
-SnailTest;
-*/

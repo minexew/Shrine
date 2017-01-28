@@ -13,7 +13,8 @@ TCP_PORT = 7777
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((TCP_IP, TCP_PORT))
 
-socks = []
+# socket #0 is never used
+socks = [False]
 
 CMD_SOCKET = 1
 CMD_CLOSE = 2
@@ -25,8 +26,12 @@ CMD_HELLO = 0xAA
 
 def recvall(sock, count):
     s = b''
+
     while len(s) < count:
-        s += sock.recv(count - len(s))
+        part = sock.recv(count - len(s))
+        if part is None: break
+        s += part
+
     return s
 
 while True:
