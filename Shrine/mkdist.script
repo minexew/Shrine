@@ -1,4 +1,4 @@
-wait	10000
+wait	10
 command	Del("::/Misc/Bible.TXT.Z");
 
 # Install distro branding, packaging & start-up
@@ -37,4 +37,4 @@ command	RedSeaISO("::/Tmp/pkg.ISO.C", "::/Tmp/pkg");
 list	/Tmp/pkg.ISO.C	pkg-pkg.ISO.C
 
 command	Reboot;
-wait	1000
+wait	1

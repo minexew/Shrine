@@ -16,7 +16,7 @@ for scripting:
 
 example script:
 
-wait    5000
+wait    5
 test
 put B:/AutoOSInstall.HC.Z AutoOSInstall.HC
 test
@@ -111,8 +111,8 @@ def do_command(*argv):
     #elif cmd == 'test':
     #    test()
     elif cmd == 'wait':
-        millisecs = int(argv[1])
-        time.sleep(millisecs * 0.001)
+        secs = float(argv[1])
+        time.sleep(secs)
     else:
         raise Exception('Command error: ' + argv[0])
 
