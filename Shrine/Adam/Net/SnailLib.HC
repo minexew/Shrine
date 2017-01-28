@@ -2,13 +2,13 @@
 
 #include "::/Doc/Comm"
 
-#define CMD_SOCKET 1
-#define CMD_CLOSE 2
-#define CMD_CONNECT_TCP 3
-#define CMD_SEND 4
-#define CMD_RECV 5
-#define CMD_RECVALL 6
-#define CMD_HELLO 0xAA
+#define CMD_SOCKET        1
+#define CMD_CLOSE         2
+#define CMD_CONNECT_TCP   3
+#define CMD_SEND          4
+#define CMD_RECV          5
+#define CMD_RECVALL       6
+#define CMD_HELLO         0xAA
 
 #define SOCK_STREAM 1
 #define SOCK_DGRAM  2
@@ -18,8 +18,9 @@
 #define AF_INET     2
 #define AF_INET6    10
 
-#define SNAIL_COM 2
-#define SNAIL_FRAME_SIZE 112
+#define SNAIL_COM         2
+#define SNAIL_TIMEOUT     500
+#define SNAIL_FRAME_SIZE  112
 
 static U8 ReadByte() {
   U8 chr;
@@ -54,8 +55,22 @@ static U0 ReadBlock(I64 port, U8* buf, I64 count) {
 I8 SnailInit() {
   CommInit8n1(SNAIL_COM, 9600);
   CommBusyPutChar(SNAIL_COM, CMD_HELLO);
-  // TODO: timeout
-  return ReadI8();
+
+  I64 max_time = cnts.jiffies + SNAIL_TIMEOUT * JIFFY_FREQ / 1000;
+
+  do {
+    I8 chr;
+
+    if (FifoU8Rem(comm_fifos[SNAIL_COM], &chr))
+      return chr;
+    else
+      Yield;
+  }
+  while (cnts.jiffies < max_time);
+
+  "$FG,6$Failed to initialize Snail -- make sure COM%d "
+  "is properly configured & snail.py is running!\n$FG$", SNAIL_COM;
+  throw;
 }
 
 I64 socket(I64 domain, I64 type) {
