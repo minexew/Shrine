@@ -10,6 +10,7 @@
 #define PKG_EVERSION    (-20004)
 #define PKG_EOSVERSION  (-20005)
 #define PKG_EUNSUITABLE (-20006)
+#define PKG_EEOF        (-20007)
 
 #define PKG_VERSION     10
 
@@ -94,6 +95,7 @@ I64 PkgGetPkgInfo(CPkgInfo* pinf, U8* package_name) {
     }
   }
 
+  Free(manifest);
   Free(url);
   return error;
 }
@@ -110,7 +112,7 @@ U8* PkgAllocISOCUrl(CPkgInfo* pinf) {
 
 I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
   I64 error = 0;
-  "Installing %s\n", pinf->package_name;
+  "Installing %s\n$FG,7$", pinf->package_name;
 
   I64 letter = MountFile(iso_c);
   if (letter) {
@@ -122,6 +124,72 @@ I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
     error = PKG_EMOUNT;
 
   Unmount(letter);
+  "$FG$";
+  return error;
+}
+
+static I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
+  CUrl curl;
+  UrlInit(&curl);
+
+  I64 error = 0;
+  I64 size = 0;
+
+  if (UrlParse(url, &curl)) {
+    if (!StrCmp(curl.protocol, "http")) {
+      I64 sock = HttpOpenGet(curl.host, curl.port, curl.path, &size);
+
+      if (sock > 0) {
+        U8* data = MAlloc(1 + size);
+        I64 total = 0;
+        I64 progress = 0;
+        "[$FG,3$";
+
+        while (total < size) {
+          I64 step = size - total;
+
+          if (step > 1024)
+            step = 1024;
+
+          I64 got = recvall(sock, data + total, step, 0);
+
+          if (got <= 0) {
+            error = PKG_EEOF;
+            break;
+          }
+
+          total += got;
+
+          I64 new_progress = (20 * total + size - 1) / size;
+          while (progress < new_progress) {
+            '' 0xfe;
+            progress++;
+          }
+        }
+
+        close(sock);
+
+        if (error) {
+          "$FG,4$x\n$FG$";
+          Free(data);
+          return error;
+        }
+
+        "$FG$]\n";
+        data[total] = 0;
+        *data_out = data;
+        *size_out = total;
+      }
+      else
+        error = sock;
+    }
+    else
+      error = URL_EPROTOCOL;
+  }
+  else
+    error = URL_EPARSE;
+
+  UrlFree(&curl);
   return error;
 }
 
@@ -155,7 +223,7 @@ I64 PkgDownloadAndInstall(CPkgInfo* pinf) {
     I64 iso_size = 0;
     "Downloading %s...\n", pinf->package_name;
 
-    I64 error = UrlGet(iso_c_url, &iso_data, &iso_size);
+    I64 error = UrlGetWithProgress(iso_c_url, &iso_data, &iso_size);
 
     if (error == 0) {
       U8* tmppath = "::/Tmp/Package.ISO.C";
@@ -228,5 +296,39 @@ I64 PkgInstall(U8* package_name) {
 
   PkgInfoFree(&pinf);
 
+  return error;
+}
+
+I64 PkgList() {
+  SnailInit();
+
+  U8* url = MStrPrint("%s/packages.list", PKG_BASE_URL);
+
+  U8* list = 0;
+  I64 size = 0;
+  I64 error = UrlGet(url, &list, &size);
+
+  if (error == 0) {
+    "$FG,2$%s\n", list;
+
+    /*U8* entry = list;
+
+    while (*entry) {
+      U8* end = StrFirstOcc(entry, "\n");
+      if (end) {
+        *end = 0;
+        end++;
+      }
+      else
+        end = value + StrLen(value);
+
+      "$FG,2$%s\n", entry;
+
+      entry = end;
+    }*/
+  }
+
+  Free(list);
+  Free(url);
   return error;
 }
