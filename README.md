@@ -61,4 +61,4 @@ Note: In Lsh, use `pkg-install xyz` in place of `PkgInstall("xyz")` etc.
 Building from source
 ====================
 
-(See here)[BUILDING.md]
+[See here](BUILDING.md)
