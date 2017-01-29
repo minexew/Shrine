@@ -33,7 +33,11 @@ U0 ReadBlk(U8* buf, I64 count) {
 }
 
 U0 Mfa() {
+  U8 command;
+
   CommInit8n1(MFA_COM, 115200);
+  while (FifoU8Rem(comm_fifos[MFA_COM], &command)) {}
+
   "$FG,5$minimalist file access\n"
   "\n"
   "$FG,8$- configure your VM's COM1 as follows:\n"
@@ -45,7 +49,6 @@ U0 Mfa() {
   while (1) {
   next:
     I64 key;
-    U8 command;
 
     if (ScanKey(&key) && (key == CH_ESC || key == CH_SHIFT_ESC || key == 'q'))
       break;
