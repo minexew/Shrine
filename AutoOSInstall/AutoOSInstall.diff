@@ -1,0 +1,19 @@
+--- ../TempleOS/TempleOSCD/Misc/OSInstall.HC	2017-01-29 20:12:39.304591503 +0100
++++ AutoOSInstall.HC	2017-01-24 13:03:00.939749201 +0100
+@@ -43,7 +43,6 @@
+   CATARep *head=NULL,*ata_drv=NULL,*atapi_drv=NULL;
+   CTask *task;
+   "\nIt's normal for this to freeze for a moment or two.\n";
+-  PressAKey;
+ 
+   task=User;
+   TaskWait(task);
+@@ -183,7 +182,7 @@
+   I64 res=FALSE,vm_install;
+   "\n\n\n\n\nAre you installing inside VMware, QEMU, VirtualBox "
+ 	"or a similar virtual machine? ";
+-  vm_install=YorN;
++  vm_install=TRUE;
+   DocBottom;
+ 
+   if (vm_install) {
