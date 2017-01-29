@@ -57,3 +57,28 @@ mkdir PkgBin
 ```
 
 The output will be `Shrine-HEAD.iso`.
+
+Package management functions
+============================
+
+Note: In Lsh, use `pkg-install xyz` in place of `PkgInstall("xyz")` etc.
+
+- `PkgList;`
+
+  List all packages available in the repository.
+
+- `PkgInstall(U8* package_name);`
+
+  Download & install a specific package.
+
+- `PkgInstallFromFile(U8* manifest_path);`
+
+  Manually install a downloaded package. Manifest must reference an existing .ISO.C path.
+
+- `PkgMakeFromDir(U8* manifest_path, U8* src_dir);`
+
+  Build a package from directory contents. For an example manifest, check [here](Shrine/Packages/Lsh/manifest). Manifest must reference a valid .ISO.C path which will be used as **output**!
+
+- `PkgMakeFromFile(U8* manifest_path, U8* file_path);`
+
+  Build a package from a single file. See above for details.
