@@ -1,4 +1,4 @@
-command	MkDir("/Tmp/SlaveOnce");
+command	DirMk("/Tmp/SlaveOnce");
 put	/Tmp/SlaveOnce/SlaveOnce.HC.Z	AutoOSInstall/SlaveOnce.HC
 command	ISO9660ISO("/Tmp/SlaveOnce.ISO", "/Tmp/SlaveOnce");
 command	DelTree("/Tmp/SlaveOnce");
