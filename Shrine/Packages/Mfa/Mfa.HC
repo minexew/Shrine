@@ -4,13 +4,13 @@
 
 #define MFA_COM 1
 
-U8 in_buf[255];
-U8 out_buf[255];
+static CComm* comm;
+static U8 in_buf[256];
 
 U8* ReadStr() {
   I64 len = 0;
   while (1) {
-    if (FifoU8Rem(comm_fifos[MFA_COM], in_buf + len)) {
+    if (FifoU8Rem(comm->RX_fifo, in_buf + len)) {
       if (in_buf[len] == '\n')
         break;
       len++;
@@ -24,7 +24,7 @@ U8* ReadStr() {
 
 U0 ReadBlk(U8* buf, I64 count) {
   while (count) {
-    if (FifoU8Rem(comm_fifos[MFA_COM], buf)) {
+    if (FifoU8Rem(comm->RX_fifo, buf)) {
       buf++;
       count--;
     }
@@ -35,8 +35,8 @@ U0 ReadBlk(U8* buf, I64 count) {
 U0 Mfa() {
   U8 command;
 
-  CommInit8n1(MFA_COM, 115200);
-  while (FifoU8Rem(comm_fifos[MFA_COM], &command)) {}
+  comm = CommInit8n1(MFA_COM, 115200);
+  while (FifoU8Rem(comm->RX_fifo, &command)) {}
 
   "$FG,5$minimalist file access\n"
   "\n"
@@ -53,7 +53,7 @@ U0 Mfa() {
     if (ScanKey(&key) && (key == CH_ESC || key == CH_SHIFT_ESC || key == 'q'))
       break;
 
-    if (!FifoU8Rem(comm_fifos[MFA_COM], &command)) {
+    if (!FifoU8Rem(comm->RX_fifo, &command)) {
       Sleep(50);
       goto next;
     }
@@ -65,9 +65,8 @@ U0 Mfa() {
     if (command == 'L') {
       U8* file = FileRead(line, &size);
 
-      StrPrint(out_buf, "S%d\n", size);
-      CommBusyPutS(MFA_COM, out_buf);
-      CommBusyWriteBlk(MFA_COM, file, size);
+      CommPrint(MFA_COM, "S%d\n", size);
+      CommPutBlk(MFA_COM, file, size);
       Free(file);
 
       "Sent %d\n", size;
@@ -89,7 +88,7 @@ U0 Mfa() {
       ExePutS(line);
     }
     else if (command == '?') {
-      CommBusyPutS(MFA_COM, "!\n");
+      CommPutS(MFA_COM, "!\n");
     }
   }
 

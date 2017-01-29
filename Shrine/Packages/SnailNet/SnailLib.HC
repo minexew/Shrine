@@ -22,10 +22,12 @@
 #define SNAIL_TIMEOUT     500
 #define SNAIL_FRAME_SIZE  112
 
+static CComm* snail_comm;
+
 static U8 ReadByte() {
   U8 chr;
   while (1) {
-    if (FifoU8Rem(comm_fifos[SNAIL_COM], &chr))
+    if (FifoU8Rem(snail_comm->RX_fifo, &chr))
       return chr;
     else
       Yield;
@@ -35,16 +37,16 @@ static U8 ReadByte() {
 static I8 ReadI8() {
   I8 chr;
   while (1) {
-    if (FifoU8Rem(comm_fifos[SNAIL_COM], &chr))
+    if (FifoU8Rem(snail_comm->RX_fifo, &chr))
       return chr;
     else
       Yield;
   }
 }
 
-static U0 ReadBlock(I64 port, U8* buf, I64 count) {
+static U0 ReadBlock(U8* buf, I64 count) {
   while (count) {
-    if (FifoU8Rem(comm_fifos[port], buf)) {
+    if (FifoU8Rem(snail_comm->RX_fifo, buf)) {
       buf++;
       count--;
     }
@@ -55,15 +57,15 @@ static U0 ReadBlock(I64 port, U8* buf, I64 count) {
 I64 SnailInit() {
   U8 chr;
 
-  CommInit8n1(SNAIL_COM, 115200);
-  while (FifoU8Rem(comm_fifos[SNAIL_COM], &chr)) {}
+  snail_comm = CommInit8n1(SNAIL_COM, 115200);
+  while (FifoU8Rem(snail_comm->RX_fifo, &chr)) {}
 
-  CommBusyPutChar(SNAIL_COM, CMD_HELLO);
+  CommPutChar(SNAIL_COM, CMD_HELLO);
 
   I64 max_time = cnts.jiffies + SNAIL_TIMEOUT * JIFFY_FREQ / 1000;
 
   do {
-    if (FifoU8Rem(comm_fifos[SNAIL_COM], &chr)) {
+    if (FifoU8Rem(snail_comm->RX_fifo, &chr)) {
       if (chr == CMD_HELLO) {
         return 0;
       }
@@ -85,25 +87,25 @@ I64 SnailInit() {
 }
 
 I64 socket(I64 domain, I64 type) {
-  CommBusyPutChar(SNAIL_COM, CMD_SOCKET);
-  CommBusyPutChar(SNAIL_COM, domain);
-  CommBusyPutChar(SNAIL_COM, type);
+  CommPutChar(SNAIL_COM, CMD_SOCKET);
+  CommPutChar(SNAIL_COM, domain);
+  CommPutChar(SNAIL_COM, type);
   return ReadI8();
 }
 
 I64 close(I64 sockfd) {
-  CommBusyPutChar(SNAIL_COM, CMD_CLOSE);
-  CommBusyPutChar(SNAIL_COM, sockfd);
+  CommPutChar(SNAIL_COM, CMD_CLOSE);
+  CommPutChar(SNAIL_COM, sockfd);
   return ReadI8();
 }
 
 I64 connectTcp(I64 sockfd, U8* addr, U16 port) {
-  CommBusyPutChar(SNAIL_COM, CMD_CONNECT_TCP);
-  CommBusyPutChar(SNAIL_COM, sockfd);
-  CommBusyPutChar(SNAIL_COM, StrLen(addr));
-  CommBusyPutS(SNAIL_COM, addr);
-  CommBusyPutChar(SNAIL_COM, port & 0xff);
-  CommBusyPutChar(SNAIL_COM, port >> 8);
+  CommPutChar(SNAIL_COM, CMD_CONNECT_TCP);
+  CommPutChar(SNAIL_COM, sockfd);
+  CommPutChar(SNAIL_COM, StrLen(addr));
+  CommPutS(SNAIL_COM, addr);
+  CommPutChar(SNAIL_COM, port & 0xff);
+  CommPutChar(SNAIL_COM, port >> 8);
   return ReadI8();
 }
 
@@ -116,10 +118,10 @@ I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
     if (step > SNAIL_FRAME_SIZE)
       step = SNAIL_FRAME_SIZE;
 
-    CommBusyPutChar(SNAIL_COM, CMD_RECVALL);
-    CommBusyPutChar(SNAIL_COM, sockfd);
-    CommBusyPutChar(SNAIL_COM, step);
-    CommBusyPutChar(SNAIL_COM, flags);
+    CommPutChar(SNAIL_COM, CMD_RECVALL);
+    CommPutChar(SNAIL_COM, sockfd);
+    CommPutChar(SNAIL_COM, step);
+    CommPutChar(SNAIL_COM, flags);
     I64 got = ReadI8();
 
     if (got < 0)
@@ -127,7 +129,7 @@ I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
     else if (got == 0)
       break;
 
-    ReadBlock(SNAIL_COM, buf + total, got);
+    ReadBlock(buf + total, got);
     total += got;
   }
 
@@ -136,11 +138,11 @@ I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
 
 I64 send(I64 sockfd, U8* buf, I64 len, I64 flags) {
   // FIXME: use frames
-  CommBusyPutChar(SNAIL_COM, CMD_SEND);
-  CommBusyPutChar(SNAIL_COM, sockfd);
-  CommBusyPutChar(SNAIL_COM, len);
-  CommBusyPutChar(SNAIL_COM, flags);
-  CommBusyWriteBlk(SNAIL_COM, buf, len);
+  CommPutChar(SNAIL_COM, CMD_SEND);
+  CommPutChar(SNAIL_COM, sockfd);
+  CommPutChar(SNAIL_COM, len);
+  CommPutChar(SNAIL_COM, flags);
+  CommPutBlk(SNAIL_COM, buf, len);
   return ReadI8();
 }
 

@@ -216,8 +216,8 @@ I64 Autocomplete(U8* buffer) {
   return count;
 }
 
-U8* CurDirShort() {
-  U8* dir = CurDir();
+U8* DirCurShort() {
+  U8* dir = DirCur();
   // FIXME!!
   if (!StrCmp(dir, "C:/Home")) {
     Free(dir);
@@ -248,7 +248,7 @@ Bool IsPath(U8* str) {
 U8* Prompt() {
   // TODO: Avoid malloc if we can rely on MAX_PATH
   static U8 buf[200];  
-  U8* dir = CurDirShort();
+  U8* dir = DirCurShort();
 
   //StrPrint(buf, "$FG,5$" LAMBDA " $FG,8$%s $FG,0$", dir);
   StrPrint(buf, "$FG,8$%s $FG,5$" LAMBDA " $FG,0$", dir);

@@ -1,0 +1,16 @@
+--- ../TempleOS/TempleOSCD/Doc/Comm.HC	2017-01-29 20:20:20.343074245 +0100
++++ Patched/Doc/Comm.HC	2017-01-29 20:47:19.000000000 +0100
+@@ -105,10 +105,11 @@
+   CComm *c=&comm_ports[port];
+   PUSHFD
+   CLI
+-  FifoU8Ins(c->TX_fifo,b);
++  while (!FifoU8Ins(c->TX_fifo,b)) {
++    Yield;
++  }
+   OutU8(c->base+UART_IER,3);	//RX and THR empty
+   POPFD
+-  Sleep(10); //!!! Remove this line!!!	Linux echo_socket is too slow.
+ }
+ 
+ U0 CommPutS(I64 port,U8 *st)

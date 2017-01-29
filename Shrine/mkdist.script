@@ -11,7 +11,7 @@ command	Del("/Misc/Bible.TXT.Z");
 #     (we don't actually need network access)
 #     because SnailLib proper re-includes /Doc/Comm, which
 #     would reset all RX fifos to NULL and break the MFA connection
-command	MkDir("/Adam/Net");
+command	DirMk("/Adam/Net");
 put	/Adam/Net/Http.HC.Z	Shrine/Packages/SnailNet/Http.HC
 put	/Adam/Net/SnailLib.HC.Z	Shrine/SnailLibDummy.HC
 put	/Adam/Net/Url.HC.Z	Shrine/Packages/SnailNet/Url.HC
@@ -47,10 +47,10 @@ list	/Tmp/Pkg.ISO.C	PkgBin/Pkg.ISO.C
 list	/Tmp/Pkg.MF	PkgBin/Pkg.MF
 
 # Shrine
-command	MkDir("/Tmp/Shrine");
-command	MkDir("/Tmp/Shrine/Adam");
-command	MkDir("/Tmp/Shrine/Doc");
-command	MkDir("/Tmp/Shrine/Misc");
+command	DirMk("/Tmp/Shrine");
+command	DirMk("/Tmp/Shrine/Adam");
+command	DirMk("/Tmp/Shrine/Doc");
+command	DirMk("/Tmp/Shrine/Misc");
 put	/Tmp/Shrine/Once.HC.Z	Shrine/Patched/Once.HC
 put	/Tmp/Shrine/Adam/ADefine.HC.Z	Shrine/Patched/Adam/ADefine.HC
 put	/Tmp/Shrine/Doc/Start.DD.Z	Shrine/Patched/Doc/Start.DD
@@ -63,7 +63,7 @@ list	/Tmp/Shrine.ISO.C	PkgBin/Shrine.ISO.C
 list	/Tmp/Shrine.MF	PkgBin/Shrine.MF
 
 # SnailNet
-command	MkDir("/Tmp/SnailNet");
+command	DirMk("/Tmp/SnailNet");
 put	/Tmp/SnailNet/Http.HC.Z	Shrine/Packages/SnailNet/Http.HC
 put	/Tmp/SnailNet/SnailLib.HC.Z	Shrine/Packages/SnailNet/SnailLib.HC
 put	/Tmp/SnailNet/Url.HC.Z	Shrine/Packages/SnailNet/Url.HC
@@ -83,7 +83,7 @@ list	/Tmp/Wget.MF	PkgBin/Wget.MF
 
 # Clean up & build a distro
 command	DelTree("/Tmp");
-command	MkDir("/Tmp");
+command	DirMk("/Tmp");
 
 command	#include "/Misc/DoDistro";
 list	/Tmp/ShrineDist.ISO	Shrine-HEAD.iso

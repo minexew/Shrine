@@ -335,7 +335,7 @@ public I64 PkgInstallFromFile(U8* manifest_path) {
 // Install a package from the repository
 public I64 PkgInstall(U8* package_name) {
   SnailInit();
-  MkDir(PKG_LOCAL_REPO);
+  DirMk(PKG_LOCAL_REPO);
 
   CPkgInfo pinf;
 
@@ -465,7 +465,7 @@ public I64 PkgMakeFromDir(U8* manifest_path, U8* src_dir) {
 // Build a package using a single file
 I64 PkgMakeFromFile(U8* manifest_path, U8* file_path) {
   DelTree(PKG_TMP_DIR);
-  MkDir(PKG_TMP_DIR);
+  DirMk(PKG_TMP_DIR);
 
   U8* tmppath = MStrPrint("%s/%s", PKG_TMP_DIR, StripDir(file_path));
   Copy(file_path, tmppath);

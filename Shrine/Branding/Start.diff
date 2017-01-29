@@ -1,10 +1,11 @@
 --- ../TempleOS/TempleOSCD/Doc/Start.DD	2017-01-28 13:54:16.758439439 +0100
-+++ Patched/Doc/Start.DD	2017-01-29 17:40:55.703466608 +0100
-@@ -1,4 +1,6 @@
++++ Patched/Doc/Start.DD	2017-01-29 20:50:45.000000000 +0100
+@@ -1,4 +1,7 @@
 -$WW+H,1$$FG,5$$TX+CX,"TempleOS V5.02",D="DD_OS_NAME_VERSION"$$FG$
 +
 +$WW+H,1$$FG,3$$TX+CX,"Shrine",D="DD_OS_NAME_VERSION"$$FG$
 +$WW+H,1$$FG,5$$TX+CX,"based on TempleOS by Terry A. Davis"$$FG$
++$WW+H,1$$FG,4$$TX+CX,"5.03 BRANCH - EXPERIMENTAL!"$$FG$
  
  $TX+CX,"Public Domain Operating System"$
  
