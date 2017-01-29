@@ -187,6 +187,13 @@ static I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
   return error;
 }
 
+// This only checks if the package is installable IN GENERAL.
+// You still need to do PkgCheckCompatibility, dependency resolution,
+// and check for a suitable download format.
+Bool PkgIsInstallable(CPkgInfo* pinf) {
+  return pinf->version != NULL && pinf->installdir != NULL;
+}
+
 I64 PkgCheckCompatibility(CPkgInfo* pinf) {
   if (pinf->pkgmin > PKG_VERSION) {
     "$FG,6$This package requires a more recent version of $FG,5$Pkg\n";
@@ -311,28 +318,34 @@ I64 PkgInstall(U8* package_name) {
   I64 error = PkgGetPkgInfo(&pinf, package_name);
 
   if (error == 0) {
-    "$FG,8$  Package              Ver   \n"
-    "$FG,8$  Dir                  Size  \n"
-    "$FG,8$============================\n"
-    "$FG,7$Install:\n";
-    "$FG,2$+ %-20s %-6s\n", package_name, pinf.version;
-    "$FG,2$  %-20s %-6s\n", pinf.installdir, FormatSize(pinf.size);
-    "\n"
-    "$FG$Is this ok? (y/n) ";
-    I64 ok = GetKey(NULL, TRUE);
-    "\n";
+    if (PkgIsInstallable(&pinf)) {
+      "$FG,8$  Package              Ver   \n"
+      "$FG,8$  Dir                  Size  \n"
+      "$FG,8$============================\n"
+      "$FG,7$Install:\n";
+      "$FG,2$+ %-20s %-6s\n", package_name, pinf.version;
+      "$FG,2$  %-20s %-6s\n", pinf.installdir, FormatSize(pinf.size);
+      "\n"
+      "$FG$Is this ok? (y/n) ";
+      I64 ok = GetKey(NULL, TRUE);
+      "\n";
 
-    // TODO: verify all packages before we start downloading
+      // TODO: verify all packages before we start downloading
 
-    if (ok == 'y') {
-      error = PkgDownloadAndInstall(&pinf);
+      if (ok == 'y') {
+        error = PkgDownloadAndInstall(&pinf);
 
-      if (error == 0) {
-        "$FG,2$Installed 1 package(s)\n";
+        if (error == 0) {
+          "$FG,2$Installed 1 package(s)\n";
+        }
+        else {
+          "$FG,4$PkgDownloadAndInstall error: %d\n$FG$", error;
+        }
       }
-      else {
-        "$FG,4$PkgDownloadAndInstall error: %d\n$FG$", error;
-      }
+    }
+    else {
+      "$FG,4$PkgInstall: %s is not installable\n$FG$", package_name;
+      error = PKG_EUNSUITABLE;
     }
   }
   else {
