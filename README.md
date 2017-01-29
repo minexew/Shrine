@@ -52,6 +52,7 @@ cd ..
 
 # Finally run the machinery
 qemu-img create -f qcow2 ~/shrine.img 2G
+mkdir PkgBin
 ./make-dist.py TempleOSCD-v502.ISO Shrine ~/shrine.img 
 ```
 

@@ -130,7 +130,10 @@ if not args.skip_tos_install:
 mkdist_script = os.path.join(DISTRO_DIR, 'mkdist.script')
 mkdist_timeout = float(open(os.path.join(DISTRO_DIR, 'mkdist-timeout')).read())
 
-print('Ready to install %s. Press Enter to continue. As soon as the TempleOS boot menu appears, press 1.' % DISTRO_DIR)
+print()
+print('=====================================================')
+print(' Ready to install %s. Press Enter to continue.' % DISTRO_DIR)
+print(' As soon as the TempleOS boot menu appears, press 1.')
 raw_input()
 
-run_qemu_and_mfa(QEMU_COMMAND, mkdist_script, mkdist_timeout, with_snail=True)
+run_qemu_and_mfa(QEMU_COMMAND, mkdist_script, mkdist_timeout, with_snail=False)

@@ -1,0 +1,8 @@
+website	https://github.com/minexew/Shrine
+pkgmin	10
+iso.c	::/Tmp/SnailNet.ISO.C
+osmin	502
+osmax	502
+version	5.02.0
+release	5020
+installdir	::/Adam/Net
