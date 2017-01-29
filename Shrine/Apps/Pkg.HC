@@ -14,8 +14,9 @@
 
 #define PKG_VERSION     10
 
-static U8* LOCAL_REPO_URL = "::/Misc/Packages";
 static U8* PKG_BASE_URL = "http://shrineupd.ddns.net:8000/packages";
+static U8* PKG_LOCAL_REPO = "::/Misc/Packages";
+static U8* PKG_TMP_DIR = "::/Tmp/PkgTmp";
 
 class CPkgInfo {
   U8*   package_name;
@@ -51,6 +52,49 @@ U0 PkgInfoFree(CPkgInfo* pinf) {
   PkgInfoInit(pinf);
 }
 
+I64 PkgParseManifest(CPkgInfo* pinf, U8* manifest) {
+  U8* key = manifest;
+
+  while (*key) {
+    //"?%s", key;
+    U8* value = StrFirstOcc(key, "\t");
+
+    if (!value)
+      return PKG_EMANIFEST;
+
+    *value = 0;
+    value++;
+
+    U8* end = StrFirstOcc(value, "\n");
+    if (end) {
+      *end = 0;
+      end++;
+    }
+    else
+      end = value + StrLen(value);
+
+    //"%s=%s;\n", key, value;
+
+    if (0) {}
+    else if (!StrCmp(key, "pkgmin")) { pinf->pkgmin = Str2I64(value); }
+    else if (!StrCmp(key, "release")) { pinf->release = Str2I64(value); }
+    else if (!StrCmp(key, "osmin")) { pinf->osmin = Str2I64(value); }
+    else if (!StrCmp(key, "osmax")) { pinf->osmax = Str2I64(value); }
+    else if (!StrCmp(key, "size")) { pinf->size = Str2I64(value); }
+    else if (!StrCmp(key, "version")) { pinf->version = StrNew(value); }
+    else if (!StrCmp(key, "installdir")) { pinf->installdir = StrNew(value); }
+    else if (!StrCmp(key, "iso.c")) { pinf->iso_c = StrNew(value); }
+    else { /* unrecognized keys are simply ignored */ }
+
+    key = end;
+  }
+
+  return 0;
+}
+
+/*I64 PkgWriteManifest(CPkgInfo* pinf, U8* path) {
+}*/
+
 I64 PkgGetPkgInfo(CPkgInfo* pinf, U8* package_name) {
   pinf->package_name = StrNew(package_name);
 
@@ -60,40 +104,8 @@ I64 PkgGetPkgInfo(CPkgInfo* pinf, U8* package_name) {
   I64 size = 0;
   I64 error = UrlGet(url, &manifest, &size);
 
-  if (error == 0) {
-    U8* key = manifest;
-
-    while (*key) {
-      //"?%s", key;
-      U8* value = StrFirstOcc(key, "\t");
-      if (!value) { error = PKG_EMANIFEST; break; }
-      *value = 0;
-      value++;
-
-      U8* end = StrFirstOcc(value, "\n");
-      if (end) {
-        *end = 0;
-        end++;
-      }
-      else
-        end = value + StrLen(value);
-
-      //"%s=%s;\n", key, value;
-
-      if (0) {}
-      else if (!StrCmp(key, "pkgmin")) { pinf->pkgmin = Str2I64(value); }
-      else if (!StrCmp(key, "release")) { pinf->release = Str2I64(value); }
-      else if (!StrCmp(key, "osmin")) { pinf->osmin = Str2I64(value); }
-      else if (!StrCmp(key, "osmax")) { pinf->osmax = Str2I64(value); }
-      else if (!StrCmp(key, "size")) { pinf->size = Str2I64(value); }
-      else if (!StrCmp(key, "version")) { pinf->version = StrNew(value); }
-      else if (!StrCmp(key, "installdir")) { pinf->installdir = StrNew(value); }
-      else if (!StrCmp(key, "iso.c")) { pinf->iso_c = StrNew(value); }
-      else { /* unrecognized keys are simply ignored */ }
-
-      key = end;
-    }
-  }
+  if (error == 0)
+    error = PkgParseManifest(pinf, manifest);
 
   Free(manifest);
   Free(url);
@@ -108,24 +120,6 @@ U8* PkgAllocISOCUrl(CPkgInfo* pinf) {
     return StrNew(pinf->iso_c);
   else
     return MStrPrint("%s/%s", PKG_BASE_URL, pinf->iso_c);
-}
-
-I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
-  I64 error = 0;
-  "Installing %s\n$FG,7$", pinf->package_name;
-
-  I64 letter = MountFile(iso_c);
-  if (letter) {
-    U8 src_path[8];
-    StrPrint(src_path, "%c:/", letter);
-    CopyTree(src_path, pinf->installdir);
-  }
-  else
-    error = PKG_EMOUNT;
-
-  Unmount(letter);
-  "$FG$";
-  return error;
 }
 
 static I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
@@ -193,9 +187,7 @@ static I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
   return error;
 }
 
-I64 PkgDownloadAndInstall(CPkgInfo* pinf) {
-  // Validate Pkg & OS version
-
+I64 PkgCheckCompatibility(CPkgInfo* pinf) {
   if (pinf->pkgmin > PKG_VERSION) {
     "$FG,6$This package requires a more recent version of $FG,5$Pkg\n";
     "$FG$Please update.\n";
@@ -216,6 +208,33 @@ I64 PkgDownloadAndInstall(CPkgInfo* pinf) {
     return PKG_EOSVERSION;
   }
 
+  return 0;
+}
+
+I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
+  I64 error = 0;
+  "Installing %s\n$FG,7$", pinf->package_name;
+
+  I64 letter = MountFile(iso_c);
+  if (letter) {
+    U8 src_path[8];
+    StrPrint(src_path, "%c:/", letter);
+    CopyTree(src_path, pinf->installdir);
+  }
+  else
+    error = PKG_EMOUNT;
+
+  Unmount(letter);
+  "$FG$";
+  return error;
+}
+
+I64 PkgDownloadAndInstall(CPkgInfo* pinf) {
+  // Validate Pkg & OS version
+
+  I64 error = PkgCheckCompatibility(pinf);
+  if (error) { return error; }
+
   U8* iso_c_url = PkgAllocISOCUrl(pinf);
 
   if (iso_c_url) {
@@ -223,7 +242,7 @@ I64 PkgDownloadAndInstall(CPkgInfo* pinf) {
     I64 iso_size = 0;
     "Downloading %s...\n", pinf->package_name;
 
-    I64 error = UrlGetWithProgress(iso_c_url, &iso_data, &iso_size);
+    error = UrlGetWithProgress(iso_c_url, &iso_data, &iso_size);
 
     if (error == 0) {
       U8* tmppath = "::/Tmp/Package.ISO.C";
@@ -256,9 +275,35 @@ static U8* FormatSize(I64 size) {
   return buf;
 }
 
+I64 PkgInstallFromFile(U8* manifest_path) {
+  CPkgInfo pinf;
+  PkgInfoInit(&pinf);
+
+  // Parse manifest
+  I64 manifest_size;
+  U8* manifest_file = FileRead(manifest_path, &manifest_size);
+
+  // This relies on FileRead returning a 0-terminated buffer.
+  // As of v502, this happens for all file systems
+  I64 error = PkgParseManifest(&pinf, manifest_file);
+
+  if (error == 0) {
+    if (pinf.iso_c) {
+      PkgInstallISOC(&pinf, pinf.iso_c);
+    }
+    else {
+      "$FG,6$No suitable installation file. Package broken?\n";
+      error = PKG_EUNSUITABLE;
+    }
+  }
+
+  PkgInfoFree(&pinf);
+  return error;
+}
+
 I64 PkgInstall(U8* package_name) {
   SnailInit();
-  MkDir(LOCAL_REPO_URL);
+  MkDir(PKG_LOCAL_REPO);
 
   CPkgInfo pinf;
 
@@ -330,5 +375,73 @@ I64 PkgList() {
 
   Free(list);
   Free(url);
+  return error;
+}
+
+I64 PkgMakeFromDir(U8* manifest_path, U8* src_dir) {
+  CPkgInfo pinf;
+  PkgInfoInit(&pinf);
+
+  // Parse manifest
+  I64 manifest_size;
+  U8* manifest_file = FileRead(manifest_path, &manifest_size);
+
+  // This relies on FileRead returning a 0-terminated buffer.
+  // As of v502, this happens for all file systems
+  I64 error = PkgParseManifest(&pinf, manifest_file);
+
+  if (error == 0) {
+    // Build RedSea ISO
+    if (pinf.iso_c) {
+      U8* iso_path = pinf.iso_c;
+
+      // RedSeaISO doesn't return a proper error code
+      RedSeaISO(iso_path, src_dir);
+
+      // TODO: update & save manifest
+      /*CDirEntry* de;
+      if (FileFind(iso_path, &de)) {
+        pinf.size = de.size;
+
+        // Save updated manifest
+        PkgWriteManifest(&pinf, manifest_path);
+
+        Free(de->full_name);
+      }
+      else {
+        "$FG,6$Something went wrong, can't stat %s.\n", iso_path;
+        error = PKG_EMOUNT;
+      }*/
+    }
+    else {
+      "$FG,6$No output file defined.\n";
+      error = PKG_EUNSUITABLE;
+    }
+  }
+
+  PkgInfoFree(&pinf);
+  return error;
+}
+
+// TODO: Is there a built-in for this?
+static U8* StripDir(U8* file_path) {
+  U8* slash = StrLastOcc(file_path, "/");
+
+  if (slash)
+    return slash + 1;
+  else
+    return file_path;
+}
+
+I64 PkgMakeFromFile(U8* manifest_path, U8* file_path) {
+  DelTree(PKG_TMP_DIR);
+  MkDir(PKG_TMP_DIR);
+
+  U8* tmppath = MStrPrint("%s/%s", PKG_TMP_DIR, StripDir(file_path));
+  Copy(file_path, tmppath);
+
+  I64 error = PkgMakeFromDir(manifest_path, PKG_TMP_DIR);
+
+  Free(tmppath);
   return error;
 }
