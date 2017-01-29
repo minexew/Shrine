@@ -23,11 +23,11 @@ Setting up with networking
   - configure your VM: COM2 - TCP, server, 7777
   - start the VM
   - run ./snail.py
-  - you will now be able to access the Internet, try for example `pkg-install megaman`
+  - you will now be able to access the Internet, try for example `pkg-list`
   
 - To enable file access through Mfa, configure the VM as follows:
   - configure your VM: COM1 - TCP, server, 7770
-  - start /Apps/Mfa.HC.Z in the VM
+  - start `/Apps/Mfa.HC.Z` in the VM
   - on the host, use ./mfa.py to transfer commands and files
   - for example: `./mfa.py list /Apps/Mfa.HC.Z Mfa.HC`
 
