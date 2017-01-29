@@ -52,17 +52,28 @@ static U0 ReadBlock(I64 port, U8* buf, I64 count) {
   }
 }
 
-I8 SnailInit() {
+I64 SnailInit() {
+  U8 chr;
+
   CommInit8n1(SNAIL_COM, 115200);
+  while (FifoU8Rem(comm_fifos[SNAIL_COM], &chr)) {}
+
   CommBusyPutChar(SNAIL_COM, CMD_HELLO);
 
   I64 max_time = cnts.jiffies + SNAIL_TIMEOUT * JIFFY_FREQ / 1000;
 
   do {
-    I8 chr;
-
-    if (FifoU8Rem(comm_fifos[SNAIL_COM], &chr))
+    if (FifoU8Rem(comm_fifos[SNAIL_COM], &chr)) {
+      if (chr == CMD_HELLO) {
+        return 0;
+      }
+      else {
+        "$FG,6$Failed to initialize Snail -- wrong hello 0x%02X\n", chr;
+        "Are you using the right version of snail.py?\n$FG$";
+        throw;
+      }
       return chr;
+    }
     else
       Yield;
   }
