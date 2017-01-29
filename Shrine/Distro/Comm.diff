@@ -1,16 +1,28 @@
 --- ../TempleOS/TempleOSCD/Doc/Comm.HC	2017-01-29 20:20:20.343074245 +0100
-+++ Patched/Doc/Comm.HC	2017-01-29 20:47:19.000000000 +0100
-@@ -105,10 +105,11 @@
-   CComm *c=&comm_ports[port];
-   PUSHFD
-   CLI
--  FifoU8Ins(c->TX_fifo,b);
-+  while (!FifoU8Ins(c->TX_fifo,b)) {
-+    Yield;
-+  }
-   OutU8(c->base+UART_IER,3);	//RX and THR empty
-   POPFD
--  Sleep(10); //!!! Remove this line!!!	Linux echo_socket is too slow.
++++ Patched/Doc/Comm.HC	2017-01-29 23:34:51.000000000 +0100
+@@ -100,6 +100,7 @@
+   return c;
  }
  
++/*
+ public U0 CommPutChar(I64 port,U8 b)
+ {
+   CComm *c=&comm_ports[port];
+@@ -110,6 +111,17 @@
+   POPFD
+   Sleep(10); //!!! Remove this line!!!	Linux echo_socket is too slow.
+ }
++*/
++
++public U0 CommPutChar(I64 port,U8 b)
++{
++  I64 base=comm_ports[port].base;
++  while (!(InU8(base+UART_LSR) & 0x20))
++    Yield;
++  OutU8(base+UART_THR,b);
++  while (!(InU8(base+UART_LSR) & 0x20))
++    Yield;
++}
+ 
  U0 CommPutS(I64 port,U8 *st)
+ {
