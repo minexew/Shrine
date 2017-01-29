@@ -14,9 +14,9 @@
 
 #define PKG_VERSION     10
 
-static U8* PKG_BASE_URL = "http://shrineupd.ddns.net:8000/packages";
-static U8* PKG_LOCAL_REPO = "::/Misc/Packages";
-static U8* PKG_TMP_DIR = "::/Tmp/PkgTmp";
+static U8* PKG_BASE_URL =     "http://shrineupd.ddns.net:8000/packages";
+static U8* PKG_LOCAL_REPO =   "::/Misc/Packages";
+static U8* PKG_TMP_DIR =      "::/Tmp/PkgTmp";
 
 class CPkgInfo {
   U8*   package_name;
@@ -30,98 +30,17 @@ class CPkgInfo {
   U8*   iso_c;
 };
 
-U0 PkgInfoInit(CPkgInfo* pinf) {
-  pinf->package_name = 0;
+// TODO: Is there a built-in for this?
+static U8* StripDir(U8* file_path) {
+  U8* slash = StrLastOcc(file_path, "/");
 
-  pinf->pkgmin = 0x7fffffff;
-  pinf->release = 0;
-  pinf->osmin = 0;
-  pinf->osmax = 0x7fffffff;
-  pinf->size = 0;
-
-  pinf->version = 0;
-  pinf->installdir = 0;
-  pinf->iso_c = 0;
-}
-
-U0 PkgInfoFree(CPkgInfo* pinf) {
-  Free(pinf->package_name);
-  Free(pinf->version);
-  Free(pinf->installdir);
-  Free(pinf->iso_c);
-  PkgInfoInit(pinf);
-}
-
-I64 PkgParseManifest(CPkgInfo* pinf, U8* manifest) {
-  U8* key = manifest;
-
-  while (*key) {
-    //"?%s", key;
-    U8* value = StrFirstOcc(key, "\t");
-
-    if (!value)
-      return PKG_EMANIFEST;
-
-    *value = 0;
-    value++;
-
-    U8* end = StrFirstOcc(value, "\n");
-    if (end) {
-      *end = 0;
-      end++;
-    }
-    else
-      end = value + StrLen(value);
-
-    //"%s=%s;\n", key, value;
-
-    if (0) {}
-    else if (!StrCmp(key, "pkgmin")) { pinf->pkgmin = Str2I64(value); }
-    else if (!StrCmp(key, "release")) { pinf->release = Str2I64(value); }
-    else if (!StrCmp(key, "osmin")) { pinf->osmin = Str2I64(value); }
-    else if (!StrCmp(key, "osmax")) { pinf->osmax = Str2I64(value); }
-    else if (!StrCmp(key, "size")) { pinf->size = Str2I64(value); }
-    else if (!StrCmp(key, "version")) { pinf->version = StrNew(value); }
-    else if (!StrCmp(key, "installdir")) { pinf->installdir = StrNew(value); }
-    else if (!StrCmp(key, "iso.c")) { pinf->iso_c = StrNew(value); }
-    else { /* unrecognized keys are simply ignored */ }
-
-    key = end;
-  }
-
-  return 0;
-}
-
-/*I64 PkgWriteManifest(CPkgInfo* pinf, U8* path) {
-}*/
-
-I64 PkgGetPkgInfo(CPkgInfo* pinf, U8* package_name) {
-  pinf->package_name = StrNew(package_name);
-
-  U8* url = MStrPrint("%s/%s", PKG_BASE_URL, package_name);
-
-  U8* manifest = 0;
-  I64 size = 0;
-  I64 error = UrlGet(url, &manifest, &size);
-
-  if (error == 0)
-    error = PkgParseManifest(pinf, manifest);
-
-  Free(manifest);
-  Free(url);
-  return error;
-}
-
-U8* PkgAllocISOCUrl(CPkgInfo* pinf) {
-  if (!pinf->iso_c)
-    return 0;
-
-  if (StrFind("//", pinf->iso_c))
-    return StrNew(pinf->iso_c);
+  if (slash)
+    return slash + 1;
   else
-    return MStrPrint("%s/%s", PKG_BASE_URL, pinf->iso_c);
+    return file_path;
 }
 
+// If this turns out to be useful, it might be moved into ShrineNet/Url
 static I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
   CUrl curl;
   UrlInit(&curl);
@@ -187,13 +106,112 @@ static I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
   return error;
 }
 
-// This only checks if the package is installable IN GENERAL.
+U0 PkgInfoInit(CPkgInfo* pinf) {
+  pinf->package_name = 0;
+
+  pinf->pkgmin = 0x7fffffff;
+  pinf->release = 0;
+  pinf->osmin = 0;
+  pinf->osmax = 0x7fffffff;
+  pinf->size = 0;
+
+  pinf->version = 0;
+  pinf->installdir = 0;
+  pinf->iso_c = 0;
+}
+
+U0 PkgInfoFree(CPkgInfo* pinf) {
+  Free(pinf->package_name);
+  Free(pinf->version);
+  Free(pinf->installdir);
+  Free(pinf->iso_c);
+  PkgInfoInit(pinf);
+}
+
+// Returns 0 or error code
+I64 PkgParseManifest(CPkgInfo* pinf, U8* manifest) {
+  U8* key = manifest;
+
+  while (*key) {
+    //"?%s", key;
+    U8* value = StrFirstOcc(key, "\t");
+
+    if (!value)
+      return PKG_EMANIFEST;
+
+    *value = 0;
+    value++;
+
+    U8* end = StrFirstOcc(value, "\n");
+    if (end) {
+      *end = 0;
+      end++;
+    }
+    else
+      end = value + StrLen(value);
+
+    //"%s=%s;\n", key, value;
+
+    if (0) {}
+    else if (!StrCmp(key, "pkgmin")) { pinf->pkgmin = Str2I64(value); }
+    else if (!StrCmp(key, "release")) { pinf->release = Str2I64(value); }
+    else if (!StrCmp(key, "osmin")) { pinf->osmin = Str2I64(value); }
+    else if (!StrCmp(key, "osmax")) { pinf->osmax = Str2I64(value); }
+    else if (!StrCmp(key, "size")) { pinf->size = Str2I64(value); }
+    else if (!StrCmp(key, "version")) { pinf->version = StrNew(value); }
+    else if (!StrCmp(key, "installdir")) { pinf->installdir = StrNew(value); }
+    else if (!StrCmp(key, "iso.c")) { pinf->iso_c = StrNew(value); }
+    else { /* unrecognized keys are simply ignored */ }
+
+    key = end;
+  }
+
+  return 0;
+}
+
+/*I64 PkgWriteManifest(CPkgInfo* pinf, U8* path) {
+}*/
+
+// Downloads a package info from the repository.
+// Returns 0 or error code
+I64 PkgFetchManifest(CPkgInfo* pinf, U8* package_name) {
+  pinf->package_name = StrNew(package_name);
+
+  U8* url = MStrPrint("%s/%s", PKG_BASE_URL, package_name);
+
+  U8* manifest = 0;
+  I64 size = 0;
+  I64 error = UrlGet(url, &manifest, &size);
+
+  if (error == 0)
+    error = PkgParseManifest(pinf, manifest);
+
+  Free(manifest);
+  Free(url);
+  return error;
+}
+
+// Get the URL of the package's ISO.C download.
+// Returns NULL if N/A, otherwise must be Free()d.
+U8* PkgAllocISOCUrl(CPkgInfo* pinf) {
+  if (!pinf->iso_c)
+    return NULL;
+
+  // A bit hacky, but will probably always work
+  if (StrFind("//", pinf->iso_c))
+    return StrNew(pinf->iso_c);
+  else
+    return MStrPrint("%s/%s", PKG_BASE_URL, pinf->iso_c);
+}
+
+// Check if the package is installable IN GENERAL.
 // You still need to do PkgCheckCompatibility, dependency resolution,
 // and check for a suitable download format.
 Bool PkgIsInstallable(CPkgInfo* pinf) {
   return pinf->version != NULL && pinf->installdir != NULL;
 }
 
+// Check if the package is compatible with this OS & Pkg version
 I64 PkgCheckCompatibility(CPkgInfo* pinf) {
   if (pinf->pkgmin > PKG_VERSION) {
     "$FG,6$This package requires a more recent version of $FG,5$Pkg\n";
@@ -218,7 +236,12 @@ I64 PkgCheckCompatibility(CPkgInfo* pinf) {
   return 0;
 }
 
+// Install a package, using the provided ISO.C file.
+// TODO: This will also register the package as installed.
 I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
+  if (pinf->installdir == NULL)
+    return PKG_EUNSUITABLE;
+
   I64 error = 0;
   "Installing %s\n$FG,7$", pinf->package_name;
 
@@ -236,9 +259,9 @@ I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
   return error;
 }
 
+// Verify, download & install a single package
+// All dependencies must have been installed at this point.
 I64 PkgDownloadAndInstall(CPkgInfo* pinf) {
-  // Validate Pkg & OS version
-
   I64 error = PkgCheckCompatibility(pinf);
   if (error) { return error; }
 
@@ -282,7 +305,8 @@ static U8* FormatSize(I64 size) {
   return buf;
 }
 
-I64 PkgInstallFromFile(U8* manifest_path) {
+// Install a package using a local manifest file
+public I64 PkgInstallFromFile(U8* manifest_path) {
   CPkgInfo pinf;
   PkgInfoInit(&pinf);
 
@@ -308,14 +332,15 @@ I64 PkgInstallFromFile(U8* manifest_path) {
   return error;
 }
 
-I64 PkgInstall(U8* package_name) {
+// Install a package from the repository
+public I64 PkgInstall(U8* package_name) {
   SnailInit();
   MkDir(PKG_LOCAL_REPO);
 
   CPkgInfo pinf;
 
   PkgInfoInit(&pinf);
-  I64 error = PkgGetPkgInfo(&pinf, package_name);
+  I64 error = PkgFetchManifest(&pinf, package_name);
 
   if (error == 0) {
     if (PkgIsInstallable(&pinf)) {
@@ -348,7 +373,7 @@ I64 PkgInstall(U8* package_name) {
     }
   }
   else {
-    "$FG,4$PkgGetPkgInfo error: %d\n$FG$", error;
+    "$FG,4$PkgFetchManifest error: %d\n$FG$", error;
   }
 
   PkgInfoFree(&pinf);
@@ -356,7 +381,8 @@ I64 PkgInstall(U8* package_name) {
   return error;
 }
 
-I64 PkgList() {
+// List packages available in the repository
+public I64 PkgList() {
   SnailInit();
 
   U8* url = MStrPrint("%s/packages.list", PKG_BASE_URL);
@@ -390,7 +416,8 @@ I64 PkgList() {
   return error;
 }
 
-I64 PkgMakeFromDir(U8* manifest_path, U8* src_dir) {
+// Build a package from directory contents
+public I64 PkgMakeFromDir(U8* manifest_path, U8* src_dir) {
   CPkgInfo pinf;
   PkgInfoInit(&pinf);
 
@@ -435,16 +462,7 @@ I64 PkgMakeFromDir(U8* manifest_path, U8* src_dir) {
   return error;
 }
 
-// TODO: Is there a built-in for this?
-static U8* StripDir(U8* file_path) {
-  U8* slash = StrLastOcc(file_path, "/");
-
-  if (slash)
-    return slash + 1;
-  else
-    return file_path;
-}
-
+// Build a package using a single file
 I64 PkgMakeFromFile(U8* manifest_path, U8* file_path) {
   DelTree(PKG_TMP_DIR);
   MkDir(PKG_TMP_DIR);
