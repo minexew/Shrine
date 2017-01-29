@@ -20,11 +20,11 @@ Software included in Shrine:
 Setting up with networking
 ==========================
 - To enable networking through Snail:
-  - configure your VM: COM2 - TCP, server, 7777
+  - configure your VM: COM3 - TCP, server, 7777 (in VirtualBox, server = UNCHECK *Connect to existing*)
   - start the VM
   - run ./snail.py
   - you will now be able to access the Internet, try for example `pkg-list`
-  
+
 - To enable file access through Mfa, configure the VM as follows:
   - configure your VM: COM1 - TCP, server, 7770
   - start `/Apps/Mfa.HC.Z` in the VM

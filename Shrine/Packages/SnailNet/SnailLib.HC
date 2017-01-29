@@ -18,7 +18,7 @@
 #define AF_INET     2
 #define AF_INET6    10
 
-#define SNAIL_COM         2
+#define SNAIL_COM         3
 #define SNAIL_TIMEOUT     500
 #define SNAIL_FRAME_SIZE  112
 

@@ -92,7 +92,8 @@ def wait_for_subprocess(subpr, timeout):
 
 def run_qemu_and_mfa(qemu_command, mfa_script, timeout, with_snail=False):
     if with_snail:
-        qemu_command = qemu_command + ['-serial', 'tcp::%d,server' % SNAIL_PORT]
+        qemu_command = qemu_command + ['-serial', 'null',
+                                       '-serial', 'tcp::%d,server' % SNAIL_PORT]
 
     qemu = subprocess.Popen(qemu_command)
     time.sleep(QEMU_START_DELAY)
