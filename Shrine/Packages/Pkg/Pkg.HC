@@ -322,7 +322,6 @@ I64 PkgInstall(U8* package_name) {
       "$FG,8$  Package              Ver   \n"
       "$FG,8$  Dir                  Size  \n"
       "$FG,8$============================\n"
-      "$FG,7$Install:\n";
       "$FG,2$+ %-20s %-6s\n", package_name, pinf.version;
       "$FG,2$  %-20s %-6s\n", pinf.installdir, FormatSize(pinf.size);
       "\n"

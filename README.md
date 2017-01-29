@@ -58,6 +58,8 @@ Note: In Lsh, use `pkg-install xyz` in place of `PkgInstall("xyz")` etc.
 
   Build a package from a single file. See above for details.
 
+[See here](PACKAGES.md) for more information about how packages work.
+
 Building from source
 ====================
 
