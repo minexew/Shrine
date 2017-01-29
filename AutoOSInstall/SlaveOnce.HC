@@ -32,7 +32,7 @@ U0 Tmp()
 {
   OnceExe;
   DocBottom;
-  comm = CommInit8n1(1, 9600);
+  comm = CommInit8n1(1, 115200);
 
   while (1) {
     U8* command = ReadStr();
