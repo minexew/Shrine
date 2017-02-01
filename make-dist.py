@@ -72,14 +72,6 @@ INJECT_BIN = os.path.join(SELF_DIR, 'inject_templeos.py')
 MFA_BIN = os.path.join(SELF_DIR, 'mfa.py')
 SNAIL_BIN = os.path.join(SELF_DIR, 'snail.py')
 
-if not os.path.exists(PATCHED_ISO):
-    shutil.copy(INSTALL_ISO, PATCHED_ISO)
-    try:
-        subprocess.check_call([INJECT_BIN, PATCHED_ISO, 'Once.HC.Z', SLAVE_HC_Z])
-    except:
-        os.remove(PATCHED_ISO)
-        raise
-
 def wait_for_subprocess(subpr, timeout):
     while timeout >= 0:
         if subpr.poll() is not None:
@@ -125,6 +117,9 @@ def run_qemu_and_mfa(qemu_command, mfa_script, timeout, with_snail=False):
         wait_for_subprocess(qemu, 10)
 
 if not args.skip_tos_install:
+    shutil.copy(INSTALL_ISO, PATCHED_ISO)
+    subprocess.check_call([INJECT_BIN, PATCHED_ISO, 'Once.HC.Z', SLAVE_HC_Z])
+
     run_qemu_and_mfa(QEMU_COMMAND + ['-cdrom', PATCHED_ISO, '-boot', 'd'],
             os.path.join(AUTO_INSTALL_PATH, 'install.script'), AUTO_INSTALL_TIMEOUT)
 
