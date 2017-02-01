@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import sys
 sys.path.append('isoparser')
 
@@ -17,7 +19,7 @@ iso = isoparser.parse(ISO_FILE)
 with open(REPLACEMENT_FILE, 'rb') as f:
     data = f.read()
 
-record = iso.record(*PATH_TO_REPLACE.split('/'))
+record = iso.record(*[s.encode() for s in PATH_TO_REPLACE.split('/')])
 patches = record.generate_patchset(data)
 
 iso.close()
@@ -36,5 +38,5 @@ with open(ISO_FILE, 'rb+') as isof:
         isof.seek(offset, 0)
         isof.write(new)
 
-print 'Applied %d patches, %d bytes total' % (
-        len(patches), sum([len(new) for _, _, new in patches]))
+print('Applied %d patches, %d bytes total' % (
+        len(patches), sum([len(new) for _, _, new in patches])))
