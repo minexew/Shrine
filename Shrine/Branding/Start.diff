@@ -1,5 +1,7 @@
---- ../TempleOS/TempleOSCD/Doc/Start.DD	2017-01-28 13:54:16.758439439 +0100
-+++ Patched/Doc/Start.DD	2017-01-29 20:50:45.000000000 +0100
+diff --git a/../TempleOS/TempleOSCD/Doc/Start.DD b/Patched/Doc/Start.DD
+index 4db863e..e1d08a6 100644
+--- a/../TempleOS/TempleOSCD/Doc/Start.DD
++++ b/Patched/Doc/Start.DD
 @@ -1,4 +1,7 @@
 -$WW+H,1$$FG,5$$TX+CX,"TempleOS V5.02",D="DD_OS_NAME_VERSION"$$FG$
 +

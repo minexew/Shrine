@@ -1,5 +1,7 @@
---- ../TempleOS/TempleOSCD/Once.HC	2017-01-28 13:24:02.831951646 +0100
-+++ Patched/Once.HC	2017-01-28 18:05:05.319237544 +0100
+diff --git a/../TempleOS/TempleOSCD/Once.HC b/Patched/Once.HC
+index d8b4d0d..49a2512 100644
+--- a/../TempleOS/TempleOSCD/Once.HC
++++ b/Patched/Once.HC
 @@ -1,3 +1,7 @@
 +#include "::/Apps/Lsh";
 +#include "::/Apps/Pkg";
@@ -8,7 +10,7 @@
  //Place this file in /Home and change
  //anything you want.
  
-@@ -53,3 +57,4 @@
+@@ -53,3 +57,4 @@ U0 Tmp()
  }
  
  Tmp;

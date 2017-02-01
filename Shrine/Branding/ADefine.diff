@@ -1,6 +1,8 @@
---- ../TempleOS/TempleOSCD/Adam/ADefine.HC	2017-01-28 13:54:16.757439439 +0100
-+++ Patched/Adam/ADefine.HC	2017-01-28 14:20:27.735495130 +0100
-@@ -4,7 +4,7 @@
+diff --git a/../TempleOS/TempleOSCD/Adam/ADefine.HC b/Patched/Adam/ADefine.HC
+index a861bb4..c214bda 100644
+--- a/../TempleOS/TempleOSCD/Adam/ADefine.HC
++++ b/Patched/Adam/ADefine.HC
+@@ -4,7 +4,7 @@ U0 LoadDocDefines()
  {
    CBinFile *bfh=mem_boot_base-sizeof(CBinFile);
  

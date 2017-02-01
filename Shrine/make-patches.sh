@@ -3,11 +3,11 @@
 PURE_DIR=../TempleOS/TempleOSCD
 PATCHED_DIR=Patched
 
-FLAGS="-u"
+FLAGS="--no-index"
 
-diff $FLAGS "$PURE_DIR/Adam/ADefine.HC" "$PATCHED_DIR/Adam/ADefine.HC" >Branding/ADefine.diff
-diff $FLAGS "$PURE_DIR/Doc/Start.DD" "$PATCHED_DIR/Doc/Start.DD" >Branding/Start.diff
+git diff $FLAGS "$PURE_DIR/Adam/ADefine.HC" "$PATCHED_DIR/Adam/ADefine.HC" >Branding/ADefine.diff
+git diff $FLAGS "$PURE_DIR/Doc/Start.DD" "$PATCHED_DIR/Doc/Start.DD" >Branding/Start.diff
 
-diff $FLAGS "$PURE_DIR/Doc/Comm.HC" "$PATCHED_DIR/Doc/Comm.HC" >Distro/Comm.diff
-diff $FLAGS "$PURE_DIR/Misc/DoDistro.HC" "$PATCHED_DIR/Misc/DoDistro.HC" >Distro/DoDistro.diff
-diff $FLAGS "$PURE_DIR/Once.HC" "$PATCHED_DIR/Once.HC" >Distro/Once.diff
+git diff $FLAGS "$PURE_DIR/Doc/Comm.HC" "$PATCHED_DIR/Doc/Comm.HC" >Distro/Comm.diff
+git diff $FLAGS "$PURE_DIR/Misc/DoDistro.HC" "$PATCHED_DIR/Misc/DoDistro.HC" >Distro/DoDistro.diff
+git diff $FLAGS "$PURE_DIR/Once.HC" "$PATCHED_DIR/Once.HC" >Distro/Once.diff

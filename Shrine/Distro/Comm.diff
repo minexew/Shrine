@@ -1,6 +1,8 @@
---- ../TempleOS/TempleOSCD/Doc/Comm.HC	2017-01-29 20:20:20.343074245 +0100
-+++ Patched/Doc/Comm.HC	2017-01-29 23:34:51.000000000 +0100
-@@ -100,6 +100,7 @@
+diff --git a/../TempleOS/TempleOSCD/Doc/Comm.HC b/Patched/Doc/Comm.HC
+index e37e045..d6626f7 100644
+--- a/../TempleOS/TempleOSCD/Doc/Comm.HC
++++ b/Patched/Doc/Comm.HC
+@@ -100,6 +100,7 @@ public CComm *CommInit8n1(I64 port,I64 baud)
    return c;
  }
  
@@ -8,7 +10,7 @@
  public U0 CommPutChar(I64 port,U8 b)
  {
    CComm *c=&comm_ports[port];
-@@ -110,6 +111,17 @@
+@@ -110,6 +111,17 @@ public U0 CommPutChar(I64 port,U8 b)
    POPFD
    Sleep(10); //!!! Remove this line!!!	Linux echo_socket is too slow.
  }

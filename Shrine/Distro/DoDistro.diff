@@ -1,6 +1,8 @@
---- ../TempleOS/TempleOSCD/Misc/DoDistro.HC	2017-01-29 20:20:20.351074254 +0100
-+++ Patched/Misc/DoDistro.HC	2017-01-29 20:10:36.681461348 +0100
-@@ -31,7 +31,7 @@
+diff --git a/../TempleOS/TempleOSCD/Misc/DoDistro.HC b/Patched/Misc/DoDistro.HC
+index 6cd1f30..9e31ba4 100644
+--- a/../TempleOS/TempleOSCD/Misc/DoDistro.HC
++++ b/Patched/Misc/DoDistro.HC
+@@ -31,7 +31,7 @@ U0 MakeMyISO(U8 *_out_iso_filename)
    CopyTree("/Misc",	"/Distro/Misc");
  
    //To save space, optionally delete dictionary.
@@ -9,7 +11,7 @@
    CopyTree("/Linux","/Distro/Linux");	  //You can leave this out.
    DirMk("/Distro/Tmp");
    DirMk("/Distro/Tmp/ScrnShots");
-@@ -47,6 +47,6 @@
+@@ -47,6 +47,6 @@ U0 MakeMyISO(U8 *_out_iso_filename)
    Free(out_iso_filename);
  }
  
