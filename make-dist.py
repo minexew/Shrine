@@ -133,3 +133,5 @@ print(' As soon as the TempleOS boot menu appears, press 1.')
 raw_input()
 
 run_qemu_and_mfa(QEMU_COMMAND, mkdist_script, mkdist_timeout, with_snail=False)
+
+print('Success.')

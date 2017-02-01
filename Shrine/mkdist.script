@@ -26,7 +26,6 @@ command	#include "/Apps/Pkg"
 put	/Tmp/Lsh.HC.Z	Lsh/Lsh.HC
 put	/Tmp/Lsh.MF	Lsh/manifest
 command	PkgMakeFromFile("/Tmp/Lsh.MF", "/Tmp/Lsh.HC.Z");
-command	PkgInstallFromFile("/Tmp/Lsh.MF");
 list	/Tmp/Lsh.ISO.C	PkgBin/Lsh.ISO.C
 list	/Tmp/Lsh.MF	PkgBin/Lsh.MF
 
@@ -34,7 +33,6 @@ list	/Tmp/Lsh.MF	PkgBin/Lsh.MF
 put	/Tmp/Mfa.HC.Z	Mfa/Mfa.HC
 put	/Tmp/Mfa.MF	Mfa/manifest
 command	PkgMakeFromFile("/Tmp/Mfa.MF", "/Tmp/Mfa.HC.Z");
-command	PkgInstallFromFile("/Tmp/Mfa.MF");
 list	/Tmp/Mfa.ISO.C	PkgBin/Mfa.ISO.C
 list	/Tmp/Mfa.MF	PkgBin/Mfa.MF
 
@@ -42,7 +40,6 @@ list	/Tmp/Mfa.MF	PkgBin/Mfa.MF
 put	/Tmp/Pkg.HC.Z	Pkg/Pkg.HC
 put	/Tmp/Pkg.MF	Pkg/manifest
 command	PkgMakeFromFile("/Tmp/Pkg.MF", "/Tmp/Pkg.HC.Z");
-command	PkgInstallFromFile("/Tmp/Pkg.MF");
 list	/Tmp/Pkg.ISO.C	PkgBin/Pkg.ISO.C
 list	/Tmp/Pkg.MF	PkgBin/Pkg.MF
 
@@ -58,7 +55,6 @@ put	/Tmp/Shrine/Misc/DoDistro.HC.Z	Shrine/Patched/Misc/DoDistro.HC
 put	/Tmp/Shrine/Misc/PalUbuntu.HC.Z	Shrine/Branding/PalUbuntu.HC
 put	/Tmp/Shrine.MF	Shrine/manifest
 command	PkgMakeFromDir("/Tmp/Shrine.MF", "/Tmp/Shrine");
-command	PkgInstallFromFile("/Tmp/Shrine.MF");
 list	/Tmp/Shrine.ISO.C	PkgBin/Shrine.ISO.C
 list	/Tmp/Shrine.MF	PkgBin/Shrine.MF
 
@@ -69,7 +65,6 @@ put	/Tmp/SnailNet/SnailLib.HC.Z	SnailNet/SnailLib.HC
 put	/Tmp/SnailNet/Url.HC.Z	SnailNet/Url.HC
 put	/Tmp/SnailNet.MF	SnailNet/manifest
 command	PkgMakeFromDir("/Tmp/SnailNet.MF", "/Tmp/SnailNet");
-command	PkgInstallFromFile("/Tmp/SnailNet.MF");
 list	/Tmp/SnailNet.ISO.C	PkgBin/SnailNet.ISO.C
 list	/Tmp/SnailNet.MF	PkgBin/SnailNet.MF
 
@@ -77,9 +72,16 @@ list	/Tmp/SnailNet.MF	PkgBin/SnailNet.MF
 put	/Tmp/Wget.HC.Z	Wget/Wget.HC
 put	/Tmp/Wget.MF	Wget/manifest
 command	PkgMakeFromFile("/Tmp/Wget.MF", "/Tmp/Wget.HC.Z");
-command	PkgInstallFromFile("/Tmp/Wget.MF");
 list	/Tmp/Wget.ISO.C	PkgBin/Wget.ISO.C
 list	/Tmp/Wget.MF	PkgBin/Wget.MF
+
+# Install packages
+command	PkgInstallFromFile("/Tmp/Lsh.MF");
+command	PkgInstallFromFile("/Tmp/Mfa.MF");
+command	PkgInstallFromFile("/Tmp/Pkg.MF");
+command	PkgInstallFromFile("/Tmp/Shrine.MF");
+command	PkgInstallFromFile("/Tmp/SnailNet.MF");
+command	PkgInstallFromFile("/Tmp/Wget.MF");
 
 # Clean up & build a distro
 command	DelTree("/Tmp");
