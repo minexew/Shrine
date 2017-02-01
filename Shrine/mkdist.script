@@ -12,35 +12,35 @@ command	Del("/Misc/Bible.TXT.Z");
 #     because SnailLib proper re-includes /Doc/Comm, which
 #     would reset all RX fifos to NULL and break the MFA connection
 command	DirMk("/Adam/Net");
-put	/Adam/Net/Http.HC.Z	Shrine/Packages/SnailNet/Http.HC
-put	/Adam/Net/SnailLib.HC.Z	Shrine/SnailLibDummy.HC
-put	/Adam/Net/Url.HC.Z	Shrine/Packages/SnailNet/Url.HC
+put	/Adam/Net/Http.HC.Z	SnailNet/Http.HC
+put	/Adam/Net/SnailLib.HC.Z	SnailNet/SnailLibDummy.HC
+put	/Adam/Net/Url.HC.Z	SnailNet/Url.HC
 
 # Inject Pkg
-put	/Apps/Pkg.HC.Z	Shrine/Packages/Pkg/Pkg.HC
+put	/Apps/Pkg.HC.Z	Pkg/Pkg.HC
 command	#include "/Apps/Pkg"
 
 # From this point on, we have a package manager -- and we're not scared to use it
 
 # Lsh
-put	/Tmp/Lsh.HC.Z	Shrine/Packages/Lsh/Lsh.HC
-put	/Tmp/Lsh.MF	Shrine/Packages/Lsh/manifest
+put	/Tmp/Lsh.HC.Z	Lsh/Lsh.HC
+put	/Tmp/Lsh.MF	Lsh/manifest
 command	PkgMakeFromFile("/Tmp/Lsh.MF", "/Tmp/Lsh.HC.Z");
 command	PkgInstallFromFile("/Tmp/Lsh.MF");
 list	/Tmp/Lsh.ISO.C	PkgBin/Lsh.ISO.C
 list	/Tmp/Lsh.MF	PkgBin/Lsh.MF
 
 # Mfa
-put	/Tmp/Mfa.HC.Z	Shrine/Packages/Mfa/Mfa.HC
-put	/Tmp/Mfa.MF	Shrine/Packages/Mfa/manifest
+put	/Tmp/Mfa.HC.Z	Mfa/Mfa.HC
+put	/Tmp/Mfa.MF	Mfa/manifest
 command	PkgMakeFromFile("/Tmp/Mfa.MF", "/Tmp/Mfa.HC.Z");
 command	PkgInstallFromFile("/Tmp/Mfa.MF");
 list	/Tmp/Mfa.ISO.C	PkgBin/Mfa.ISO.C
 list	/Tmp/Mfa.MF	PkgBin/Mfa.MF
 
 # Pkg
-put	/Tmp/Pkg.HC.Z	Shrine/Packages/Pkg/Pkg.HC
-put	/Tmp/Pkg.MF	Shrine/Packages/Pkg/manifest
+put	/Tmp/Pkg.HC.Z	Pkg/Pkg.HC
+put	/Tmp/Pkg.MF	Pkg/manifest
 command	PkgMakeFromFile("/Tmp/Pkg.MF", "/Tmp/Pkg.HC.Z");
 command	PkgInstallFromFile("/Tmp/Pkg.MF");
 list	/Tmp/Pkg.ISO.C	PkgBin/Pkg.ISO.C
@@ -56,7 +56,7 @@ put	/Tmp/Shrine/Adam/ADefine.HC.Z	Shrine/Patched/Adam/ADefine.HC
 put	/Tmp/Shrine/Doc/Start.DD.Z	Shrine/Patched/Doc/Start.DD
 put	/Tmp/Shrine/Misc/DoDistro.HC.Z	Shrine/Patched/Misc/DoDistro.HC
 put	/Tmp/Shrine/Misc/PalUbuntu.HC.Z	Shrine/Branding/PalUbuntu.HC
-put	/Tmp/Shrine.MF	Shrine/Packages/Shrine/manifest
+put	/Tmp/Shrine.MF	Shrine/manifest
 command	PkgMakeFromDir("/Tmp/Shrine.MF", "/Tmp/Shrine");
 command	PkgInstallFromFile("/Tmp/Shrine.MF");
 list	/Tmp/Shrine.ISO.C	PkgBin/Shrine.ISO.C
@@ -64,18 +64,18 @@ list	/Tmp/Shrine.MF	PkgBin/Shrine.MF
 
 # SnailNet
 command	DirMk("/Tmp/SnailNet");
-put	/Tmp/SnailNet/Http.HC.Z	Shrine/Packages/SnailNet/Http.HC
-put	/Tmp/SnailNet/SnailLib.HC.Z	Shrine/Packages/SnailNet/SnailLib.HC
-put	/Tmp/SnailNet/Url.HC.Z	Shrine/Packages/SnailNet/Url.HC
-put	/Tmp/SnailNet.MF	Shrine/Packages/SnailNet/manifest
+put	/Tmp/SnailNet/Http.HC.Z	SnailNet/Http.HC
+put	/Tmp/SnailNet/SnailLib.HC.Z	SnailNet/SnailLib.HC
+put	/Tmp/SnailNet/Url.HC.Z	SnailNet/Url.HC
+put	/Tmp/SnailNet.MF	SnailNet/manifest
 command	PkgMakeFromDir("/Tmp/SnailNet.MF", "/Tmp/SnailNet");
 command	PkgInstallFromFile("/Tmp/SnailNet.MF");
 list	/Tmp/SnailNet.ISO.C	PkgBin/SnailNet.ISO.C
 list	/Tmp/SnailNet.MF	PkgBin/SnailNet.MF
 
 # Wget
-put	/Tmp/Wget.HC.Z	Shrine/Packages/Wget/Wget.HC
-put	/Tmp/Wget.MF	Shrine/Packages/Wget/manifest
+put	/Tmp/Wget.HC.Z	Wget/Wget.HC
+put	/Tmp/Wget.MF	Wget/manifest
 command	PkgMakeFromFile("/Tmp/Wget.MF", "/Tmp/Wget.HC.Z");
 command	PkgInstallFromFile("/Tmp/Wget.MF");
 list	/Tmp/Wget.ISO.C	PkgBin/Wget.ISO.C
