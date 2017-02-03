@@ -60,6 +60,7 @@ list	/Tmp/Shrine.MF	PkgBin/Shrine.MF
 command	DirMk("/Tmp/SnailNet");
 put	/Tmp/SnailNet/Http.HC.Z	SnailNet/Http.HC
 put	/Tmp/SnailNet/SnailLib.HC.Z	SnailNet/SnailLib.HC
+put	/Tmp/SnailNet/Socket.HC.Z	SnailNet/Socket.HC
 put	/Tmp/SnailNet/Url.HC.Z	SnailNet/Url.HC
 put	/Tmp/SnailNet.MF	SnailNet/manifest
 command	PkgMakeFromDir("/Tmp/SnailNet.MF", "/Tmp/SnailNet");
