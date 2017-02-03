@@ -1,5 +1,7 @@
 // vim: set ft=cpp:
 
+#include "::/Adam/Net/Http"
+
 #define URL_EPARSE    (-201)
 #define URL_EPROTOCOL (-202)
 

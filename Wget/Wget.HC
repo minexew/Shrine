@@ -1,8 +1,7 @@
 // vim: set ft=cpp:
 
-#include "::/Adam/Net/SnailLib"
-#include "::/Adam/Net/Http"
 #include "::/Adam/Net/Url"
+#include "::/Adam/Net/Http"
 
 I64 Wget(U8* url, U8* saveas = NULL) {
   SnailInit();

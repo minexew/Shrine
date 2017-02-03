@@ -1,8 +1,7 @@
 // vim: set ft=cpp:
 
-#include "::/Adam/Net/SnailLib"
-#include "::/Adam/Net/Http"
 #include "::/Adam/Net/Url"
+#include "::/Adam/Net/Http"
 
 #define PKG_EURL        (-20001)
 #define PKG_EMOUNT      (-20002)

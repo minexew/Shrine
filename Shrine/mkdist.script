@@ -6,14 +6,12 @@ command	Del("/Misc/Bible.TXT.Z");
 # The idea is to get a package manager running as early as possible,
 # and used for the rest of the content
 
-# Inject SnailNet, because Pkg depends on it
-# !!! We need to inject a dummy version of SnailLib
-#     (we don't actually need network access)
-#     because SnailLib proper re-includes /Doc/Comm, which
-#     would reset all RX fifos to NULL and break the MFA connection
+# Inject SnailNet subset needed to run Pkg
+# !!! We mustn't inject tunelled SnailLib as it would re-include /Doc/Comm,
+#     resetting all RX fifos to NULL and breaking the MFA connection
 command	DirMk("/Adam/Net");
 put	/Adam/Net/Http.HC.Z	SnailNet/Http.HC
-put	/Adam/Net/SnailLib.HC.Z	SnailNet/SnailLibDummy.HC
+put	/Adam/Net/Socket.HC.Z	SnailNet/SocketDummy.HC
 put	/Adam/Net/Url.HC.Z	SnailNet/Url.HC
 
 # Inject Pkg

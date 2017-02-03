@@ -1,7 +1,6 @@
 // vim: set ft=cpp:
 
-// A socket implementation such as SnailLib
-// must be #included before this!
+#include "::/Adam/Net/Socket"
 
 #define HTTP_ECONNECT   (-101)
 #define HTTP_EPROTOCOL  (-102)
