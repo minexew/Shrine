@@ -4,7 +4,7 @@
 #include "::/Adam/Net/Http"
 
 I64 Wget(U8* url, U8* saveas = NULL) {
-  SnailInit();
+  SocketInit();
 
   CUrl curl;
   UrlInit(&curl);

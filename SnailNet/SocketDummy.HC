@@ -8,7 +8,7 @@
 #define AF_INET     2
 #define AF_INET6    10
 
-I64 SnailInit() { throw; return -1; }
+I64 SocketInit() { throw; return -1; }
 I64 socket(I64, I64) { return -1; }
 I64 close(I64) { return -1; }
 I64 connectTcp(I64, U8*, U16) { return -1; }

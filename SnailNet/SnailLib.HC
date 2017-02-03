@@ -54,7 +54,7 @@ static U0 ReadBlock(U8* buf, I64 count) {
   }
 }
 
-I64 SnailInit() {
+I64 SocketInit() {
   U8 chr;
 
   snail_comm = CommInit8n1(SNAIL_COM, 115200);

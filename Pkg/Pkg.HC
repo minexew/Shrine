@@ -333,7 +333,7 @@ public I64 PkgInstallFromFile(U8* manifest_path) {
 
 // Install a package from the repository
 public I64 PkgInstall(U8* package_name) {
-  SnailInit();
+  SocketInit();
   DirMk(PKG_LOCAL_REPO);
 
   CPkgInfo pinf;
@@ -382,7 +382,7 @@ public I64 PkgInstall(U8* package_name) {
 
 // List packages available in the repository
 public I64 PkgList() {
-  SnailInit();
+  SocketInit();
 
   U8* url = MStrPrint("%s/packages.list", PKG_BASE_URL);
 
