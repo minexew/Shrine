@@ -20,6 +20,15 @@ command	#include "/Apps/Pkg"
 
 # From this point on, we have a package manager -- and we're not scared to use it
 
+# HwSupp
+command	DirMk("/Tmp/HwSupp");
+put	/Tmp/HwSupp/Pci.HC.Z	HwSupp/Pci.HC
+put	/Tmp/HwSupp/PCNet.HC.Z	HwSupp/PCNet.HC
+put	/Tmp/HwSupp.MF	HwSupp/manifest
+command	PkgMakeFromDir("/Tmp/HwSupp.MF", "/Tmp/HwSupp");
+list	/Tmp/HwSupp.ISO.C	PkgBin/HwSupp.ISO.C
+list	/Tmp/HwSupp.MF	PkgBin/HwSupp.MF
+
 # Lsh
 put	/Tmp/Lsh.HC.Z	Lsh/Lsh.HC
 put	/Tmp/Lsh.MF	Lsh/manifest
@@ -75,6 +84,7 @@ list	/Tmp/Wget.ISO.C	PkgBin/Wget.ISO.C
 list	/Tmp/Wget.MF	PkgBin/Wget.MF
 
 # Install packages
+command	PkgInstallFromFile("/Tmp/HwSupp.MF");
 command	PkgInstallFromFile("/Tmp/Lsh.MF");
 command	PkgInstallFromFile("/Tmp/Mfa.MF");
 command	PkgInstallFromFile("/Tmp/Pkg.MF");
