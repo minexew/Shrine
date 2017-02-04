@@ -209,17 +209,34 @@ static U0 PCNetInitDE(U32 buf_addr, U8 *des, I64 idx, I64 is_tx) {
     des[idx * PCNET_DE_SIZE + 7] = 0x80;
 }
 
-static U0 PCNetAllocBuffers() {
+static I64 PCNetAllocBuffers() {
   I64 i;
 
-  rdes_phys = MAlloc(PCNET_DE_SIZE * rx_buffer_count);
-  tdes_phys = MAlloc(PCNET_DE_SIZE * tx_buffer_count);
+  I64 rdes_size = PCNET_DE_SIZE * rx_buffer_count;
+  I64 tdes_size = PCNET_DE_SIZE * tx_buffer_count;
+
+  rdes_phys = MAlloc(rdes_size);
+  tdes_phys = MAlloc(tdes_size);
+
+  if (rdes_phys + rdes_size > 0x100000000 || tdes_phys + tdes_size > 0x100000000) {
+    "$FG,4$PCNetAllocBuffers: rdes_phys=%08Xh tdes_phys=%08Xh\n$FG$", rdes_phys, tdes_phys;
+    return -1;
+  }
+
   rdes = rdes_phys + dev.uncached_alias;
   tdes = tdes_phys + dev.uncached_alias;
 
+  I64 rx_buffers_size = ETHERNET_FRAME_SIZE * rx_buffer_count;
+  I64 tx_buffers_size = ETHERNET_FRAME_SIZE * tx_buffer_count;
+
   // TODO: shouldn't these be uncached as well?
-  rx_buffers = MAlloc(ETHERNET_FRAME_SIZE * rx_buffer_count);
-  tx_buffers = MAlloc(ETHERNET_FRAME_SIZE * tx_buffer_count);
+  rx_buffers = MAlloc(rx_buffers_size);
+  tx_buffers = MAlloc(tx_buffers_size);
+
+  if (rx_buffers + rx_buffers_size > 0x100000000 || tx_buffers + tx_buffers_size > 0x100000000) {
+    "$FG,4$PCNetAllocBuffers: rx_buffers=%08Xh tx_buffers=%08Xh\n$FG$", rx_buffers, tx_buffers;
+    return -1;
+  }
 
   for (i = 0; i < rx_buffer_count; i++)
     PCNetInitDE(rx_buffers, rdes, i, FALSE);
@@ -229,6 +246,8 @@ static U0 PCNetAllocBuffers() {
 
   //"rdes: %08Xh\ttdes: %08X\n", rdes, tdes;
   //"rbuf: %08Xh\ttbuf: %08X\n", rx_buffers, tx_buffers;
+
+  return 0;
 }
 
 interrupt U0 PCNetIrq() {
@@ -288,7 +307,8 @@ static U0 PCNetInit(I64 bus, I64 dev_, I64 fun) {
 
   PCNetReadEeprom(0, my_mac, 6);
 
-  PCNetAllocBuffers();
+  if (PCNetAllocBuffers() < 0)
+    return;
 
   U8* setup = MAlloc(sizeof(CPCNetBufferSetup));
   CPCNetBufferSetup* u_setup = setup + dev.uncached_alias;
@@ -347,6 +367,10 @@ static U0 PCNetInit(I64 bus, I64 dev_, I64 fun) {
 
 I64 EthernetFrameAlloc(U8** buffer_out, U8* src_addr, U8* dst_addr, U16 ethertype, I64 length, I64 flags) {
   U8* frame;
+
+  // APAD_XMT doesn't seem to work in VirtualBox, so we have to pad the frame ourselves
+  if (length < 46)
+    length = 46;
 
   I64 index = PCNetAllocTxPacket(&frame, 14 + length, flags);
 
