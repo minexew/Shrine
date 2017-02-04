@@ -29,7 +29,7 @@ U0 NetHandlerTask(I64) {
       HandleNetFifoEntry(e);
     }
     else {
-      // TODO: why does using Yield only cause 99% CPU?
+      // TODO: LBts(&Fs->task_flags, TASKf_IDLE);
       Sleep(2);
       //Yield;
     }

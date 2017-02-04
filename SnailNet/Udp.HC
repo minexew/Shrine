@@ -21,7 +21,7 @@ class CUdpSocket {
 };
 
 // TODO: this takes up half a meg, change it to a binary tree or something
-CUdpSocket** udp_bound_sockets;
+static CUdpSocket** udp_bound_sockets;
 
 I64 UdpPacketAlloc(U8** frame_out, U32 source_ip, U16 source_port, U32 dest_ip, U16 dest_port, I64 length) {
   U8* frame;
@@ -94,6 +94,9 @@ I64 UdpSocketClose(CUdpSocket* s) {
 
 I64 UdpSocketConnect(CUdpSocket* s, sockaddr* addr, I64 addrlen) {
   // FIXME: implement
+  no_warn s;
+  no_warn addr;
+  no_warn addrlen;
   return -1;
 }
 
@@ -189,11 +192,11 @@ I64 UdpHandler(CIPv4Packet* packet) {
 
   //"%u => %p\n", dest_port, udp_bound_sockets[dest_port];
 
+  CUdpSocket* s = udp_bound_sockets[dest_port];
+
   // FIXME: should also check that bound address is INADDR_ANY,
   //        OR packet dest IP matches bound address
-  if (udp_bound_sockets[dest_port]) {
-    CUdpSocket* s = udp_bound_sockets[dest_port];
-
+  if (s != NULL) {
     if (s->recv_buf) {
       I64 num_recv = s->recv_len;
 
