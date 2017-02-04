@@ -57,6 +57,7 @@ command	DirMk("/Tmp/Shrine/Doc");
 command	DirMk("/Tmp/Shrine/Misc");
 put	/Tmp/Shrine/Once.HC.Z	Shrine/Patched/Once.HC
 put	/Tmp/Shrine/Adam/ADefine.HC.Z	Shrine/Patched/Adam/ADefine.HC
+put	/Tmp/Shrine/Adam/MakeAdam.HC.Z	Shrine/Patched/Adam/MakeAdam.HC
 put	/Tmp/Shrine/Doc/Start.DD.Z	Shrine/Patched/Doc/Start.DD
 put	/Tmp/Shrine/Misc/DoDistro.HC.Z	Shrine/Patched/Misc/DoDistro.HC
 put	/Tmp/Shrine/Misc/PalUbuntu.HC.Z	Shrine/Branding/PalUbuntu.HC
@@ -68,13 +69,19 @@ list	/Tmp/Shrine.MF	PkgBin/Shrine.MF
 # SnailNet
 command	DirMk("/Tmp/SnailNet");
 put	/Tmp/SnailNet/Arp.HC.Z	SnailNet/Arp.HC
+put	/Tmp/SnailNet/Dhcp.HC.Z	SnailNet/Dhcp.HC
 put	/Tmp/SnailNet/Ethernet.HC.Z	SnailNet/Ethernet.HC
 put	/Tmp/SnailNet/Http.HC.Z	SnailNet/Http.HC
 put	/Tmp/SnailNet/Icmp.HC.Z	SnailNet/Icmp.HC
 put	/Tmp/SnailNet/IPv4.HC.Z	SnailNet/IPv4.HC
+put	/Tmp/SnailNet/MakeSnailNet.HC.Z	SnailNet/MakeSnailNet.HC
+put	/Tmp/SnailNet/Netcfg.HC.Z	SnailNet/Netcfg.HC
 put	/Tmp/SnailNet/NetFifo.HC.Z	SnailNet/NetFifo.HC
+put	/Tmp/SnailNet/NetHandlerTask.HC.Z	SnailNet/NetHandlerTask.HC
 put	/Tmp/SnailNet/SnailLib.HC.Z	SnailNet/SnailLib.HC
 put	/Tmp/SnailNet/Socket.HC.Z	SnailNet/Socket.HC
+put	/Tmp/SnailNet/SocketLib.HC.Z	SnailNet/SocketLib.HC
+put	/Tmp/SnailNet/Udp.HC.Z	SnailNet/Udp.HC
 put	/Tmp/SnailNet/Url.HC.Z	SnailNet/Url.HC
 put	/Tmp/SnailNet.MF	SnailNet/manifest
 command	PkgMakeFromDir("/Tmp/SnailNet.MF", "/Tmp/SnailNet");

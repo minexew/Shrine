@@ -1,0 +1,10 @@
+diff --git a/../TempleOS/TempleOSCD/Adam/MakeAdam.HC b/Patched/Adam/MakeAdam.HC
+index 8b5c2f7..16f9985 100644
+--- a/../TempleOS/TempleOSCD/Adam/MakeAdam.HC
++++ b/Patched/Adam/MakeAdam.HC
+@@ -30,3 +30,5 @@ LBts(&sys_run_level,RLf_DOC);
+ #include "AMouse"
+ #include "Host"
+ Cd("..");;
++
++#include "::/Adam/Net/MakeSnailNet"

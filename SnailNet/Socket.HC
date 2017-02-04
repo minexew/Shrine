@@ -1,6 +1,10 @@
 // vim: set ft=c:
 
-#include "::/Adam/Net/SnailLib"
+#exe {
+  if (SNAILNET_NATIVE_DRIVER == NULL) {
+    StreamPrint("#include \"::/Adam/Net/SnailLib\"");
+  }
+}
 
 // Higher-level, utility functions
 
