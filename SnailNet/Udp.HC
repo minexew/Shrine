@@ -92,6 +92,11 @@ I64 UdpSocketClose(CUdpSocket* s) {
   return 0;
 }
 
+I64 UdpSocketConnect(CUdpSocket* s, sockaddr* addr, I64 addrlen) {
+  // FIXME: implement
+  return -1;
+}
+
 I64 UdpSocketRecvfrom(CUdpSocket* s, U8* buf, I64 len, I64 flags, sockaddr* src_addr, I64 addrlen) {
   no_warn flags;
 
@@ -156,6 +161,7 @@ CUdpSocket* UdpSocket(U16 domain, U16 type) {
   CUdpSocket* s =       MAlloc(sizeof(CUdpSocket));
   s->sock.bind =        &UdpSocketBind;
   s->sock.close =       &UdpSocketClose;
+  s->sock.connect =     &UdpSocketConnect;
   s->sock.recvfrom =    &UdpSocketRecvfrom;
   s->sock.sendto =      &UdpSocketSendto;
   s->sock.setsockopt =  &UdpSocketSetsockopt;
