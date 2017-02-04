@@ -57,7 +57,6 @@ static U16 IPv4Checksum(U8* header, I64 length) {
   I64 nleft = length;
   U16* w = header;
   I64 sum = 0;
-  U16 answer = 0;
 
   while (nleft > 1)  {
     sum += *(w++);
@@ -66,15 +65,13 @@ static U16 IPv4Checksum(U8* header, I64 length) {
 
   // mop up an odd byte, if necessary
   if (nleft == 1) {
-    answer = (answer & 0xff00) | ((*w) & 0x00ff);
-    sum += answer;
+    sum += ((*w) & 0x00ff);
   }
 
   // add back carry outs from top 16 bits to low 16 bits
   sum = (sum >> 16) + (sum & 0xffff); // add hi 16 to low 16
   sum += (sum >> 16);         // add carry
-  answer = ~sum;              // truncate to 16 bits
-  return answer;
+  return (~sum) & 0xffff;
 }
 
 static I64 GetEthernetAddressForIP(U32 ip, U8** mac_out) {
@@ -203,13 +200,15 @@ I64 IPv4ParsePacket(CIPv4Packet* packet_out, CEthFrame* eth_frame) {
   //    header_length, hdr->proto, ntohl(hdr->source_ip), ntohl(hdr->dest_ip),
   //    eth_frame->length - header_length;
 
+  U16 total_length = ntohs(hdr->total_length);
+
   packet_out->l2_frame = eth_frame;
   packet_out->source_ip = ntohl(hdr->source_ip);
   packet_out->dest_ip = ntohl(hdr->dest_ip);
   packet_out->proto = hdr->proto;
 
   packet_out->data = eth_frame->data + header_length;
-  packet_out->length = eth_frame->length - header_length;
+  packet_out->length = total_length - header_length;
 
   return 0;
 }
