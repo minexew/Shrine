@@ -410,6 +410,9 @@ public I64 PkgList() {
       entry = end;
     }*/
   }
+  else {
+    "$FG,4$UrlGet error: %d\n$FG$", error;
+  }
 
   Free(list);
   Free(url);
