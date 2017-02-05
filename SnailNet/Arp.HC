@@ -83,6 +83,7 @@ CArpCacheEntry* ArpCachePut(U32 ip, U8* mac) {
     MemCpy(e->mac, mac, 6);
     arp_cache = e;
   }
+  // FIXME: else replace!
 
   return e;
 }
