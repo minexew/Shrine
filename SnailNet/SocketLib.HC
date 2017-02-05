@@ -31,6 +31,17 @@ class sockaddr_in {
   U8      sin_zero[8];
 };
 
+class addrinfo {
+  I32       ai_flags;
+  I32       ai_family;
+  I32       ai_socktype;
+  I32       ai_protocol;
+  I64       ai_addrlen;
+  sockaddr* ai_addr;
+  U8*       ai_canonname;
+  addrinfo* ai_next;
+};
+
 I64 inet_aton(U8* cp, in_addr* inp) {
   // FIXME: error handling
   I64 a, b, c, d;
@@ -65,7 +76,14 @@ class CSocketClass {
   CSocket* (*socket)(U16 domain, U16 type);
 };
 
+class CAddrResolver {
+  // TODO: allow different resolvers for different socket domains
+
+  I64 (*getaddrinfo)(U8* node, U8* service, addrinfo* hints, addrinfo** res);
+};
+
 static CSocketClass* socket_classes = NULL;
+static CAddrResolver* socket_addr_resolver = NULL;
 
 static CSocketClass* FindSocketClass(U16 domain, U16 type) {
   CSocketClass* cls = socket_classes;
