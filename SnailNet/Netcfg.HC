@@ -121,6 +121,7 @@ I64 DhcpConfigure() {
     "$FG,2$Obtained IP address %s\n$FG$", inet_ntoa(in);
     IPv4SetAddress(yiaddr);
     IPv4SetSubnet(router_ip, subnet_mask);
+    DnsSetResolverIPv4(dns_ip);
     return 0;
   }
   else
@@ -129,6 +130,8 @@ I64 DhcpConfigure() {
 
 U0 Netcfg() {
   SocketInit();
+
+  "$FG,7$Netcfg: Configuring network...\n$FG$";
 
   I64 error = DhcpConfigure();
   if (error < 0)

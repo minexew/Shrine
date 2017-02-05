@@ -70,6 +70,7 @@ list	/Tmp/Shrine.MF	PkgBin/Shrine.MF
 command	DirMk("/Tmp/SnailNet");
 put	/Tmp/SnailNet/Arp.HC.Z	SnailNet/Arp.HC
 put	/Tmp/SnailNet/Dhcp.HC.Z	SnailNet/Dhcp.HC
+put	/Tmp/SnailNet/Dns.HC.Z	SnailNet/Dns.HC
 put	/Tmp/SnailNet/Ethernet.HC.Z	SnailNet/Ethernet.HC
 put	/Tmp/SnailNet/Http.HC.Z	SnailNet/Http.HC
 put	/Tmp/SnailNet/Icmp.HC.Z	SnailNet/Icmp.HC

@@ -31,6 +31,9 @@
     StreamPrint("#include \"::/Adam/Net/Icmp\"");
     StreamPrint("#include \"::/Adam/Net/Udp\"");
 
+    // L7
+    StreamPrint("#include \"::/Adam/Net/Dns\"");
+
     // Handler Task
     StreamPrint("#include \"::/Adam/Net/NetHandlerTask\"");
 

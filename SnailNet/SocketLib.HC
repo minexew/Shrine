@@ -15,6 +15,8 @@
 // optval = I64*
 #define SO_RCVTIMEO_MS 1
 
+#define AI_CACHED   0x8000
+
 class in_addr {
   U32 s_addr;
 };
@@ -159,6 +161,39 @@ I64 setsockopt(I64 sockfd, I64 level, I64 optname, U8* optval, I64 optlen) {
 
 I64 connectTcp(I64, U8*, U16) { return -1; }
 I64 recvall(I64, U8*, I64, I64) { return -1; }
+I64 getaddrinfo(U8* node, U8* service, addrinfo* hints, addrinfo** res) {
+  if (socket_addr_resolver) return socket_addr_resolver->getaddrinfo(node, service, hints, res);
+  else return -1;
+}
+
+U0 freeaddrinfo(addrinfo* res) {
+  while (res) {
+    addrinfo* next = res->ai_next;
+    Free(res->ai_addr);
+    Free(res->ai_canonname);
+    Free(res);
+    res = next;
+  }
+}
+
+U0 AddrInfoCopy(addrinfo* ai_out, addrinfo* ai_in) {
+  MemCpy(ai_out, ai_in, sizeof(addrinfo));
+
+  if (ai_in->ai_addr) {
+    ai_out->ai_addr = MAlloc(ai_in->ai_addrlen);
+    MemCpy(ai_out->ai_addr, ai_in->ai_addr, ai_in->ai_addrlen);
+  }
+
+  if (ai_in->ai_canonname) {
+    ai_out->ai_canonname = StrNew(ai_in->ai_canonname);
+  }
+}
+
+U8* gai_strerror(I64 errcode) {
+  no_warn errcode;
+  return "Unspecified error";
+}
+
 
 U0 RegisterSocketClass(U16 domain, U16 type, CSocket* (*socket)(U16 domain, U16 type)) {
   CSocketClass* cls = MAlloc(sizeof(CSocketClass));
