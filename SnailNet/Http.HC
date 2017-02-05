@@ -6,6 +6,8 @@
 #define HTTP_EPROTOCOL  (-102)
 #define HTTP_EREQUEST   (-103)
 
+#define HTTP_USER_AGENT "SnailNet ($TX+CX,"TempleOS",D="DD_OS_NAME_VERSION"$)"
+
 I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
   U8 line[256];
   I64 error = 0;
@@ -15,6 +17,10 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
   if (!port)
     port = 80;
 
+  // Should this be done here though?
+  if (*path == 0)
+    path = "/";
+
   //"Connect(%s:%d)\n", host, port;
   error = connectTcp(sock, host, port);
   //"connect: %d\n", error;
@@ -23,6 +29,7 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
     sendString(sock, line, 0);
     StrPrint(line, "Host: %s\r\n", host);
     sendString(sock, line, 0);
+    sendString(sock, "User-Agent: " HTTP_USER_AGENT "\r\n", 0);
     sendString(sock, "\r\n", 0);
 
     Bool haveHTTP = FALSE;
