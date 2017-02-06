@@ -76,12 +76,12 @@ put	/Tmp/SnailNet/Http.HC.Z	SnailNet/Http.HC
 put	/Tmp/SnailNet/Icmp.HC.Z	SnailNet/Icmp.HC
 put	/Tmp/SnailNet/IPv4.HC.Z	SnailNet/IPv4.HC
 put	/Tmp/SnailNet/MakeSnailNet.HC.Z	SnailNet/MakeSnailNet.HC
+put	/Tmp/SnailNet/NativeSocket.HC.Z	SnailNet/NativeSocket.HC
 put	/Tmp/SnailNet/Netcfg.HC.Z	SnailNet/Netcfg.HC
 put	/Tmp/SnailNet/NetFifo.HC.Z	SnailNet/NetFifo.HC
 put	/Tmp/SnailNet/NetHandlerTask.HC.Z	SnailNet/NetHandlerTask.HC
 put	/Tmp/SnailNet/SnailLib.HC.Z	SnailNet/SnailLib.HC
 put	/Tmp/SnailNet/Socket.HC.Z	SnailNet/Socket.HC
-put	/Tmp/SnailNet/SocketLib.HC.Z	SnailNet/SocketLib.HC
 put	/Tmp/SnailNet/Tcp.HC.Z	SnailNet/Tcp.HC
 put	/Tmp/SnailNet/Udp.HC.Z	SnailNet/Udp.HC
 put	/Tmp/SnailNet/Url.HC.Z	SnailNet/Url.HC

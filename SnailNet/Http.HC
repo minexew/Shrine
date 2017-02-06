@@ -12,8 +12,6 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
   U8 line[256];
   I64 error = 0;
 
-  I64 sock = socket(AF_INET, SOCK_STREAM);
-
   if (!port)
     port = 80;
 
@@ -22,9 +20,9 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
     path = "/";
 
   //"Connect(%s:%d)\n", host, port;
-  error = connectTcp(sock, host, port);
-  //"connect: %d\n", error;
-  if (error == 0) {
+  I64 sock = create_connection(host, port);
+  //"create_connection: %d\n", sock;
+  if (sock >= 0) {
     StrPrint(line, "GET %s HTTP/1.1\r\n", path);
     sendString(sock, line, 0);
     StrPrint(line, "Host: %s\r\n", host);

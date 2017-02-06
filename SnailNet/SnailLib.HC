@@ -99,14 +99,26 @@ I64 close(I64 sockfd) {
   return ReadI8();
 }
 
-I64 connectTcp(I64 sockfd, U8* addr, U16 port) {
+I64 create_connection(U8* addr, U16 port) {
+  I64 sockfd = socket(AF_INET, SOCK_STREAM);
+
+  if (sockfd < 0)
+    return sockfd;
+
   CommPutChar(SNAIL_COM, CMD_CONNECT_TCP);
   CommPutChar(SNAIL_COM, sockfd);
   CommPutChar(SNAIL_COM, StrLen(addr));
   CommPutS(SNAIL_COM, addr);
   CommPutChar(SNAIL_COM, port & 0xff);
   CommPutChar(SNAIL_COM, port >> 8);
-  return ReadI8();
+
+  I64 error = ReadI8();
+  if (error < 0) {
+    close(sockfd);
+    return error;
+  }
+
+  return sockfd;
 }
 
 I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {

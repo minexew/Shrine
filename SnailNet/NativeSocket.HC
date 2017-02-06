@@ -1,21 +1,21 @@
 // vim: set ft=c:
 
-#define SOCK_STREAM 1
-#define SOCK_DGRAM  2
-#define SOCK_RAW    3
+#define SOCK_STREAM     1
+#define SOCK_DGRAM      2
+#define SOCK_RAW        3
 
-#define AF_UNSPEC   0
-#define AF_INET     2
-#define AF_INET6    10
+#define AF_UNSPEC       0
+#define AF_INET         2
+#define AF_INET6        10
 
-#define INADDR_ANY  0
+#define INADDR_ANY      0
 
-#define SOL_SOCKET  1
+#define SOL_SOCKET      1
 
 // optval = I64*
-#define SO_RCVTIMEO_MS 1
+#define SO_RCVTIMEO_MS  1
 
-#define AI_CACHED   0x8000
+#define AI_CACHED       0x8000
 
 class in_addr {
   U32 s_addr;
@@ -159,8 +159,6 @@ I64 setsockopt(I64 sockfd, I64 level, I64 optname, U8* optval, I64 optlen) {
   else return -1;
 }
 
-I64 connectTcp(I64, U8*, U16) { return -1; }
-I64 recvall(I64, U8*, I64, I64) { return -1; }
 I64 getaddrinfo(U8* node, U8* service, addrinfo* hints, addrinfo** res) {
   if (socket_addr_resolver) return socket_addr_resolver->getaddrinfo(node, service, hints, res);
   else return -1;
@@ -194,6 +192,67 @@ U8* gai_strerror(I64 errcode) {
   return "Unspecified error";
 }
 
+// Inspired by https://docs.python.org/3.7/library/socket.html#socket.create_connection
+I64 create_connection(U8* hostname, U16 port) {
+  sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(port);
+  addr.sin_addr.s_addr = 0;
+
+  addrinfo* res;
+  I64 error = getaddrinfo(hostname, NULL, NULL, &res);
+
+  if (error < 0) {
+    "$FG,4$getaddrinfo: error %d\n$FG$", error;
+  }
+  else {
+    addrinfo* curr = res;
+
+    while (curr) {
+      if (curr->ai_family == AF_INET && (curr->ai_socktype == 0 || curr->ai_socktype == SOCK_STREAM)) {
+        addr.sin_addr.s_addr = (curr->ai_addr(sockaddr_in*))->sin_addr.s_addr;
+        freeaddrinfo(res);
+
+        I64 sockfd = socket(AF_INET, SOCK_STREAM);
+
+        if (sockfd < 0)
+          return sockfd;
+
+        error = connect(sockfd, &addr, sizeof(addr));
+
+        if (error < 0) {
+          close(sockfd);
+          return error;
+        }
+
+        return sockfd;
+      }
+
+      curr = curr->ai_next;
+    }
+
+    "$FG,4$create_connection: no suitable address\n$FG$";
+  }
+
+  freeaddrinfo(res);
+  return -1;
+}
+
+I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
+  I64 total = 0;
+
+  while (len) {
+    I64 got = recv(sockfd, buf + total, len, flags);
+
+    if (got < 0)
+      break;
+
+    len -= got;
+    total += got;
+  }
+
+  return total;
+}
 
 U0 RegisterSocketClass(U16 domain, U16 type, CSocket* (*socket)(U16 domain, U16 type)) {
   CSocketClass* cls = MAlloc(sizeof(CSocketClass));

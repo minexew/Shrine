@@ -18,7 +18,7 @@
     StreamPrint("#include \"::/Adam/HwSupp/%s\"", native_driver);
 
     // Contains a lot of common definitions, probably should be cleaned up
-    StreamPrint("#include \"::/Adam/Net/SocketLib\"");
+    StreamPrint("#include \"::/Adam/Net/NativeSocket\"");
 
     // L2
     StreamPrint("#include \"::/Adam/Net/Ethernet\"");
