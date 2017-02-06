@@ -82,6 +82,7 @@ put	/Tmp/SnailNet/NetHandlerTask.HC.Z	SnailNet/NetHandlerTask.HC
 put	/Tmp/SnailNet/SnailLib.HC.Z	SnailNet/SnailLib.HC
 put	/Tmp/SnailNet/Socket.HC.Z	SnailNet/Socket.HC
 put	/Tmp/SnailNet/SocketLib.HC.Z	SnailNet/SocketLib.HC
+put	/Tmp/SnailNet/Tcp.HC.Z	SnailNet/Tcp.HC
 put	/Tmp/SnailNet/Udp.HC.Z	SnailNet/Udp.HC
 put	/Tmp/SnailNet/Url.HC.Z	SnailNet/Url.HC
 put	/Tmp/SnailNet.MF	SnailNet/manifest

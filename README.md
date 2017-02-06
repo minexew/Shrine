@@ -7,7 +7,7 @@ Shrine is a TempleOS distribution that aims to be more modern & approachable.
 
 Shrine aims to improve upon TempleOS in several aspects:
 - Approachability: Shrine ships with Lambda Shell, a more traditional Unix-like command interpreter
-- Connectivity: Snail is a tunelled network interface that lets you connect to the internet
+- Connectivity: TCP/IP stack! Internet access!
 - Software access: Shrine includes a package downloader
 - Versatility: unlike stock TempleOS, Shrine requires only 64MB RAM, making it feasible for cloud micro-instances and similar setups (note: this is planned, but currently not true)
 
@@ -19,8 +19,14 @@ Software included in Shrine:
 
 Setting up with networking
 ==========================
-- To enable networking through Snail:
+- Native Stack (highly experimental)
+  - configure your VM networking: *Adapter Type: PCnet-PCI II* (`pcnet` in QEMU)
+  - *Attached to: NAT* seems to be the most reliable setting, Bridged Mode also works somewhat
+  - On boot, Shrine will automatically attempt to acquire an IP address. If you don't get a message about "Configuring network", the adapter was not detected.
+
+- To enable tunelled networking through Snail:
   - configure your VM: COM3 - TCP, server, 7777 (in VirtualBox, server = UNCHECK *Connect to existing*)
+  - (make sure to *disable* networking for the VM, otherwise Native Stack will get precedence)
   - start the VM
   - run ./snail.py
   - you will now be able to access the Internet, try for example `pkg-list`

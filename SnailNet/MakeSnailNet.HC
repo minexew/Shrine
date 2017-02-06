@@ -29,6 +29,7 @@
 
     // L4
     StreamPrint("#include \"::/Adam/Net/Icmp\"");
+    StreamPrint("#include \"::/Adam/Net/Tcp\"");
     StreamPrint("#include \"::/Adam/Net/Udp\"");
 
     // L7
