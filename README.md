@@ -22,7 +22,7 @@ Setting up with networking
 - Native Stack (highly experimental)
   - configure your VM networking: *Adapter Type: PCnet-PCI II* (`pcnet` in QEMU)
   - *Attached to: NAT* seems to be the most reliable setting, Bridged Mode also works somewhat
-  - Make sure the VM has *no more than* 3 GB RAM, otherwise the driver will fail to load.
+  - Make sure the VM has **no more than 3 GB RAM**, otherwise the driver will fail to load.
   - On boot, Shrine will automatically attempt to acquire an IP address. If you don't get a message about "Configuring network", the adapter was not detected.
 
 - To enable tunelled networking through Snail:
