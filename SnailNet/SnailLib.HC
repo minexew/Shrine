@@ -121,6 +121,25 @@ I64 create_connection(U8* addr, U16 port) {
   return sockfd;
 }
 
+I64 recv(I64 sockfd, U8* buf, I64 len, I64 flags) {
+  I64 total = 0;
+
+  // This will be problematic for UDP
+  if (len > SNAIL_FRAME_SIZE)
+    len = SNAIL_FRAME_SIZE;
+
+  CommPutChar(SNAIL_COM, CMD_RECV);
+  CommPutChar(SNAIL_COM, sockfd);
+  CommPutChar(SNAIL_COM, len);
+  CommPutChar(SNAIL_COM, flags);
+  I64 got = ReadI8();
+
+  if (got > 0)
+    ReadBlock(buf, got);
+
+  return got;
+}
+
 I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
   I64 total = 0;
 

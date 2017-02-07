@@ -62,7 +62,7 @@ static I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
           if (step > 1024)
             step = 1024;
 
-          I64 got = recvall(sock, data + total, step, 0);
+          I64 got = recv(sock, data + total, step, 0);
 
           if (got <= 0) {
             error = PKG_EEOF;

@@ -63,6 +63,18 @@ while True:
             rc = 0xff
 
         sock.send(struct.pack('B', rc))
+    elif cmd == CMD_RECV:
+        sockfd, length, flags = struct.unpack('BBB', recvall(sock, 3))
+        #print('recv(%d, %d, %d)' % (sockfd, length, flags))
+
+        try:
+            data = socks[sockfd].recv(length)
+        except socket.error as e:
+            print(e)
+            data = b''
+
+        sock.send(struct.pack('B', len(data)))
+        sock.send(data)
     elif cmd == CMD_RECVALL:
         sockfd, length, flags = struct.unpack('BBB', recvall(sock, 3))
         #print('recvall(%d, %d, %d)' % (sockfd, length, flags))
