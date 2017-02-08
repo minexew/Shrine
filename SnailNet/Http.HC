@@ -1,14 +1,20 @@
 // vim: set ft=cpp:
 
 #include "::/Adam/Net/Socket"
+#include "::/Adam/Net/UrlParse"
 
 #define HTTP_ECONNECT   (-101)
 #define HTTP_EPROTOCOL  (-102)
 #define HTTP_EREQUEST   (-103)
+#define HTTP_EREDIRECT  (-104)
+#define HTTP_EEOF       (-105)
 
+#define HTTP_MAX_REDIRECTS  5
 #define HTTP_USER_AGENT "SnailNet ($TX+CX,"TempleOS",D="DD_OS_NAME_VERSION"$)"
 
-I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
+// Returns socket (>= 0) on success, error code on failure
+I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out,
+    I64 allowed_redirects = HTTP_MAX_REDIRECTS) {
   U8 line[256];
   I64 error = 0;
 
@@ -32,6 +38,9 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
 
     Bool haveHTTP = FALSE;
     Bool haveContentLength = FALSE;
+    U8* location = NULL;
+
+    I64 code = -1;
 
     while (1) {
       error = recvLine(sock, line, sizeof(line), 0);
@@ -45,11 +54,21 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
         break;
       }
 
+      U8* delim;
+
       //"%s\n", line;
       if (!haveHTTP) {
-        U8* code = StrFirstOcc(line, " ");
-        if (code && StrNCmp(line, "HTTP/", 5) == 0 && StrNCmp(code + 1, "200", 3) == 0) {
-          haveHTTP = TRUE;
+        delim = StrFirstOcc(line, " ");
+        if (delim && StrNCmp(line, "HTTP/", 5) == 0) {
+          code = Str2I64(delim + 1);
+
+          if (code >= 200 && code <= 399) {
+            haveHTTP = TRUE;
+          }
+          else {
+            error = HTTP_EREQUEST;
+            break;
+          }
         }
         else {
           error = HTTP_EREQUEST;
@@ -57,7 +76,7 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
         }
       }
       else {
-        U8* delim = StrFirstOcc(line, ":");
+        delim = StrFirstOcc(line, ":");
 
         if (!delim) {
           error = HTTP_EPROTOCOL;
@@ -74,8 +93,40 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
           StrScan(delim, "%d", len_out);
           haveContentLength = TRUE;
         }
+        else if (!StrCmp(line, "Location")) {
+          location = StrNew(delim);
+        }
       }
     }
+
+    // HTTP Code 3xx -- Redirection
+    if (!error && code >= 300 && code <= 399) {
+      if (allowed_redirects > 0) {
+        CUrl curl;
+        UrlInit(&curl);
+
+        if (UrlParse(location, &curl)) {
+          if (!StrCmp(curl.protocol, "http")) {
+            close(sock);
+            sock = HttpOpenGet(curl.host, curl.port, curl.path, len_out, allowed_redirects - 1);
+
+            if (sock < 0)
+              error = sock;
+          }
+          else
+            error = HTTP_EPROTOCOL;
+        }
+        else
+          error = HTTP_EREDIRECT;
+
+        UrlFree(&curl);
+      }
+      else {
+        error = HTTP_EREDIRECT;
+      }
+    }
+
+    Free(location);
   }
   else
     error = HTTP_ECONNECT;
@@ -84,8 +135,9 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out) {
     close(sock);
     return error;
   }
-  else
+  else {
     return sock;
+  }
 }
 
 I64 HttpGet(U8* host, U16 port = 0, U8* path, U8** data_out = NULL, I64* len_out = NULL) {

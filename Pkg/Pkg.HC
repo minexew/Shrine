@@ -8,7 +8,6 @@
 #define PKG_EVERSION    (-20004)
 #define PKG_EOSVERSION  (-20005)
 #define PKG_EUNSUITABLE (-20006)
-#define PKG_EEOF        (-20007)
 
 #define PKG_VERSION     10
 
@@ -36,72 +35,6 @@ static U8* StripDir(U8* file_path) {
     return slash + 1;
   else
     return file_path;
-}
-
-// If this turns out to be useful, it might be moved into ShrineNet/Url
-static I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
-  CUrl curl;
-  UrlInit(&curl);
-
-  I64 error = 0;
-  I64 size = 0;
-
-  if (UrlParse(url, &curl)) {
-    if (!StrCmp(curl.protocol, "http")) {
-      I64 sock = HttpOpenGet(curl.host, curl.port, curl.path, &size);
-
-      if (sock > 0) {
-        U8* data = MAlloc(1 + size);
-        I64 total = 0;
-        I64 progress = 0;
-        "[$FG,3$";
-
-        while (total < size) {
-          I64 step = size - total;
-
-          if (step > 1024)
-            step = 1024;
-
-          I64 got = recv(sock, data + total, step, 0);
-
-          if (got <= 0) {
-            error = PKG_EEOF;
-            break;
-          }
-
-          total += got;
-
-          I64 new_progress = (20 * total + size - 1) / size;
-          while (progress < new_progress) {
-            '' 0xfe;
-            progress++;
-          }
-        }
-
-        close(sock);
-
-        if (error) {
-          "$FG,4$x\n$FG$";
-          Free(data);
-          return error;
-        }
-
-        "$FG$]\n";
-        data[total] = 0;
-        *data_out = data;
-        *size_out = total;
-      }
-      else
-        error = sock;
-    }
-    else
-      error = URL_EPROTOCOL;
-  }
-  else
-    error = URL_EPARSE;
-
-  UrlFree(&curl);
-  return error;
 }
 
 U0 PkgInfoInit(CPkgInfo* pinf) {

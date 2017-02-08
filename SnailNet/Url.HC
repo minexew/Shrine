@@ -2,78 +2,6 @@
 
 #include "::/Adam/Net/Http"
 
-#define URL_EPARSE    (-201)
-#define URL_EPROTOCOL (-202)
-
-class CUrl {
-  U8* protocol;
-  U8* host;
-  U16 port;
-  U8* path;
-};
-
-U0 UrlInit(CUrl* url) {
-  url->protocol = 0;
-  url->host = 0;
-  url->port = 0;
-  url->path = 0;
-}
-
-U0 UrlFree(CUrl* url) {
-  Free(url->protocol);
-  Free(url->host);
-  Free(url->path);
-  UrlInit(url);
-}
-
-Bool UrlParse(U8* url, CUrl* url_out) {
-  U8* colon = StrFirstOcc(url, ":");
-  U8* protosep = StrFind("//", url);
-
-  if (colon && colon < protosep) {
-    I64 len = colon - url;
-    url_out->protocol = MAlloc(len + 1);
-    MemCpy(url_out->protocol, url, len);
-    url_out->protocol[len] = 0;
-
-    url = colon + 1;
-    while (*url == '/')
-      url++;
-  }
-  else {
-    url_out->protocol = StrNew("http");
-  }
-
-  I64 pos = 0;
-
-  while (url[pos]) {
-    if (url[pos] == ':' || url[pos] == '/') {
-      url_out->host = MAlloc(pos + 1);
-      MemCpy(url_out->host, url, pos);
-      url_out->host[pos] = 0;
-
-      if (url[pos] == ':') {
-        I64 port = 0;
-        U8* end = 0;
-        port = Str2I64(url + pos + 1, 10, &end);
-
-        url_out->port = port;
-        url_out->path = StrNew(end);
-      }
-      else {
-        url_out->path = StrNew(url + pos);
-      }
-
-      return TRUE;
-    }
-
-    pos++;
-  }
-
-  url_out->host = StrNew(url);
-  return TRUE;
-}
-
 I64 UrlGet(U8* url, U8** data_out = NULL, I64* size_out = NULL) {
   CUrl curl;
   UrlInit(&curl);
@@ -83,6 +11,71 @@ I64 UrlGet(U8* url, U8** data_out = NULL, I64* size_out = NULL) {
   if (UrlParse(url, &curl)) {
     if (!StrCmp(curl.protocol, "http"))
       error = HttpGet(curl.host, curl.port, curl.path, data_out, size_out);
+    else
+      error = URL_EPROTOCOL;
+  }
+  else
+    error = URL_EPARSE;
+
+  UrlFree(&curl);
+  return error;
+}
+
+I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
+  CUrl curl;
+  UrlInit(&curl);
+
+  I64 error = 0;
+  I64 size = 0;
+
+  if (UrlParse(url, &curl)) {
+    if (!StrCmp(curl.protocol, "http")) {
+      I64 sock = HttpOpenGet(curl.host, curl.port, curl.path, &size);
+
+      if (sock > 0) {
+        U8* data = MAlloc(1 + size);
+        I64 total = 0;
+        I64 progress = 0;
+        "[$FG,3$";
+
+        while (total < size) {
+          I64 step = size - total;
+
+          if (step > 1024)
+            step = 1024;
+
+          I64 got = recv(sock, data + total, step, 0);
+
+          if (got <= 0) {
+            error = HTTP_EEOF;
+            break;
+          }
+
+          total += got;
+
+          I64 new_progress = (20 * total + size - 1) / size;
+          while (progress < new_progress) {
+            '' 0xfe;
+            progress++;
+          }
+        }
+
+        close(sock);
+
+        if (error) {
+          "$FG,4$x\n$FG$";
+          Free(data);
+          return error;
+        }
+
+        "$FG$]\n";
+        data[total] = 0;
+        *data_out = data;
+        *size_out = total;
+      }
+      else
+        error = sock;
+    }
     else
       error = URL_EPROTOCOL;
   }

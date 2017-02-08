@@ -13,6 +13,7 @@ command	DirMk("/Adam/Net");
 put	/Adam/Net/Http.HC.Z	SnailNet/Http.HC
 put	/Adam/Net/Socket.HC.Z	SnailNet/SocketDummy.HC
 put	/Adam/Net/Url.HC.Z	SnailNet/Url.HC
+put	/Adam/Net/UrlParse.HC.Z	SnailNet/UrlParse.HC
 
 # Inject Pkg
 put	/Apps/Pkg.HC.Z	Pkg/Pkg.HC
@@ -85,6 +86,7 @@ put	/Tmp/SnailNet/Socket.HC.Z	SnailNet/Socket.HC
 put	/Tmp/SnailNet/Tcp.HC.Z	SnailNet/Tcp.HC
 put	/Tmp/SnailNet/Udp.HC.Z	SnailNet/Udp.HC
 put	/Tmp/SnailNet/Url.HC.Z	SnailNet/Url.HC
+put	/Tmp/SnailNet/UrlParse.HC.Z	SnailNet/UrlParse.HC
 put	/Tmp/SnailNet.MF	SnailNet/manifest
 command	PkgMakeFromDir("/Tmp/SnailNet.MF", "/Tmp/SnailNet");
 list	/Tmp/SnailNet.ISO.C	PkgBin/SnailNet.ISO.C
