@@ -247,7 +247,11 @@ I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
   if (letter) {
     U8 src_path[8];
     StrPrint(src_path, "%c:/", letter);
-    DirMk(pinf->installdir);
+
+    // StrLen check is a temporary hack to not complain about MkDir("::/");
+    if (StrLen(pinf->installdir) > 3)
+      DirMk(pinf->installdir);
+
     CopyTree(src_path, pinf->installdir);
   }
   else
