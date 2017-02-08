@@ -185,9 +185,11 @@ static I64 DnsParseDomainName(U8* packet_data, I64 packet_length,
     else if (label_len >= 192) {
       label_len &= 0x3f;
 
-      *data_inout = data + 1;
-      *length_inout = length - 1;
-      jump_taken = TRUE;
+      if (!jump_taken) {
+        *data_inout = data + 1;
+        *length_inout = length - 1;
+        jump_taken = TRUE;
+      }
 
       //"jmp %d\n", ((label_len << 8) | *data);
 
