@@ -244,7 +244,7 @@ I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
   while (len) {
     I64 got = recv(sockfd, buf + total, len, flags);
 
-    if (got < 0)
+    if (got <= 0)
       break;
 
     len -= got;
