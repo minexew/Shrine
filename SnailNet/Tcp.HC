@@ -451,7 +451,10 @@ I64 TcpSocketRecvfrom(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr* src_
     Yield;
   }
 
-  if (s->state != TCP_STATE_ESTABLISHED || len == 0)
+  // TODO: this works for now, but we should be still able to receive data
+  //       in connection-closing states
+  if ((s->state != TCP_STATE_ESTABLISHED && s->recv_buf_read_pos == s->recv_buf_write_pos)
+      || len == 0)
     return 0;
 
   I64 read_pos = s->recv_buf_read_pos;
