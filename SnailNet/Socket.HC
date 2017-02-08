@@ -11,7 +11,7 @@
 I64 recvLine(I64 sock, U8* buffer, I64 size, I64 flags) {
   I64 got = 0;
   while (got + 1 < size) {
-    if (!recvall(sock, buffer + got, 1, flags))
+    if (!recv(sock, buffer + got, 1, flags))
       return -1;
 
     if (buffer[got] == '\n')
