@@ -40,11 +40,11 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((TCP_IP, TCP_PORT))
 
 def read_line():
-    s = ''
+    s = b''
     while True:
         ch = sock.recv(1)
-        if ch == '\n':
-            print('<', s)
+        if ch == b'\n':
+            print('<', s.decode())
             return s.decode()
         else:
             s += ch
@@ -121,7 +121,10 @@ if len(sys.argv) > 1:
 else:
     try:
         while True:
-            entry = raw_input()
+            if sys.version_info[0] < 3:
+                entry = raw_input()
+            else:
+                entry = input()
 
             if len(entry) and entry[0] != '#':
                 items = entry.split('\t')

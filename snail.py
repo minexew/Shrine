@@ -51,7 +51,7 @@ while True:
         sock.send(struct.pack('B', 0))
     elif cmd == CMD_CONNECT_TCP:
         sockfd, length = struct.unpack('BB', recvall(sock, 2))
-        hostname = recvall(sock, length)
+        hostname = recvall(sock, length).decode()
         port, = struct.unpack('H', recvall(sock, 2))
         print('connectTcp(%d, %s, %d)' % (sockfd, hostname, port))
 

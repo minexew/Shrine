@@ -130,7 +130,11 @@ print()
 print('=====================================================')
 print(' Ready to install %s. Press Enter to continue.' % DISTRO_DIR)
 print(' As soon as the TempleOS boot menu appears, press 1.')
-raw_input()
+
+if sys.version_info[0] < 3:
+    raw_input()
+else:
+    input()
 
 run_qemu_and_mfa(QEMU_COMMAND, mkdist_script, mkdist_timeout, with_snail=False)
 
