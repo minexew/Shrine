@@ -78,8 +78,9 @@ def do_command(*argv):
             send('P' + filename)
             send('S' + str(size))
 
-            for byte in data:
-                sock.send(byte)
+            while len(data):
+                sock.send(data[0:1])
+                data = data[1:]
                 # for 9600 baud
                 time.sleep(0.001)
 
