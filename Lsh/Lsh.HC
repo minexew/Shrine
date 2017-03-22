@@ -212,7 +212,7 @@ I64 Autocomplete(U8* buffer) {
     if (de2)
       "$FG,6$Too many results, display truncated\n$FG$";
   }
-  DirEntryDel(de);
+  DirTreeDel(de);
   return count;
 }
 
