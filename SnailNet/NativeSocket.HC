@@ -238,22 +238,6 @@ I64 create_connection(U8* hostname, U16 port) {
   return -1;
 }
 
-I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
-  I64 total = 0;
-
-  while (len) {
-    I64 got = recv(sockfd, buf + total, len, flags);
-
-    if (got <= 0)
-      break;
-
-    len -= got;
-    total += got;
-  }
-
-  return total;
-}
-
 U0 RegisterSocketClass(U16 domain, U16 type, CSocket* (*socket)(U16 domain, U16 type)) {
   CSocketClass* cls = MAlloc(sizeof(CSocketClass));
 

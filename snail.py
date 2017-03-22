@@ -21,7 +21,6 @@ CMD_CLOSE = 2
 CMD_CONNECT_TCP = 3
 CMD_SEND = 4
 CMD_RECV = 5
-CMD_RECVALL = 6
 CMD_HELLO = 0xAA
 
 def recvall(sock, count):
@@ -75,19 +74,6 @@ while True:
 
         sock.send(struct.pack('B', len(data)))
         sock.send(data)
-    elif cmd == CMD_RECVALL:
-        sockfd, length, flags = struct.unpack('BBB', recvall(sock, 3))
-        #print('recvall(%d, %d, %d)' % (sockfd, length, flags))
-
-        try:
-            data = recvall(socks[sockfd], length)
-        except socket.error as e:
-            print(e)
-            data = b''
-
-        sock.send(struct.pack('B', len(data)))
-        sock.send(data)
-
     elif cmd == CMD_SEND:
         sockfd, length, flags = struct.unpack('BBB', recvall(sock, 3))
         data = recvall(sock, length)

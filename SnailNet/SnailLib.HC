@@ -7,7 +7,6 @@
 #define CMD_CONNECT_TCP   3
 #define CMD_SEND          4
 #define CMD_RECV          5
-#define CMD_RECVALL       6
 #define CMD_HELLO         0xAA
 
 #define SOCK_STREAM 1
@@ -136,33 +135,6 @@ I64 recv(I64 sockfd, U8* buf, I64 len, I64 flags) {
     ReadBlock(buf, got);
 
   return got;
-}
-
-I64 recvall(I64 sockfd, U8* buf, I64 len, I64 flags) {
-  I64 total = 0;
-
-  while (total < len) {
-    I64 step = len - total;
-
-    if (step > SNAIL_FRAME_SIZE)
-      step = SNAIL_FRAME_SIZE;
-
-    CommPutChar(SNAIL_COM, CMD_RECVALL);
-    CommPutChar(SNAIL_COM, sockfd);
-    CommPutChar(SNAIL_COM, step);
-    CommPutChar(SNAIL_COM, flags);
-    I64 got = ReadI8();
-
-    if (got < 0)
-      return got;
-    else if (got == 0)
-      break;
-
-    ReadBlock(buf + total, got);
-    total += got;
-  }
-
-  return total;
 }
 
 I64 send(I64 sockfd, U8* buf, I64 len, I64 flags) {
