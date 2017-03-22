@@ -29,11 +29,10 @@ U0 NetHandlerTask(I64) {
       HandleNetFifoEntry(e);
     }
     else {
-      // TODO: LBts(&Fs->task_flags, TASKf_IDLE);
-      Sleep(2);
-      //Yield;
+      LBts(&Fs->task_flags, TASKf_IDLE);
+      Yield;
     }
   }
 }
 
-CTask* net_handler_task = Spawn(&NetHandlerTask, NULL, "NetHandler");
+netfifo_handler_task = Spawn(&NetHandlerTask, NULL, "NetHandler");

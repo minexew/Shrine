@@ -22,7 +22,9 @@ static CFifoI64* netfifo;
 static CNetFifoEntry* entries;
 static I64 next_entry = 0;
 
-// TODO: asm optimization?
+CTask* netfifo_handler_task = NULL;
+
+// TODO: asm optimization? or perhaps use EndianU*?
 // These don't belong here in the first place,
 // but it's convenient for Ethernet drivers
 // We'll probably split it off along with ETHERTYPE_* constants
@@ -61,6 +63,10 @@ I64 NetFifoPushCopy(U8* data, I64 length) {
 
     if (!FifoI64Ins(netfifo, entry))
         return -1;
+
+    // Wake up Handler Task
+    if (netfifo_handler_task)
+        LBtr(&netfifo_handler_task->task_flags, TASKf_IDLE);
 
     return 0;
 }
