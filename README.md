@@ -1,7 +1,7 @@
 Shrine
 ======
 
-![Screenshot](http://imgur.com/xDC3hwx.png)
+![Screenshot](http://imgur.com/vvGrZgz.png)
 
 Shrine is a TempleOS distribution that aims to be more modern & approachable.
 
