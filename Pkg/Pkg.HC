@@ -65,6 +65,14 @@ I64 PkgParseManifest(CPkgInfo* pinf, U8* manifest) {
 
   while (*key) {
     //"?%s", key;
+    U8* end = StrFirstOcc(key, "\n");
+    if (end) {
+      *end = 0;
+      end++;
+    }
+    else
+      end = key + StrLen(key);
+
     U8* value = StrFirstOcc(key, "\t");
 
     if (!value)
@@ -73,25 +81,18 @@ I64 PkgParseManifest(CPkgInfo* pinf, U8* manifest) {
     *value = 0;
     value++;
 
-    U8* end = StrFirstOcc(value, "\n");
-    if (end) {
-      *end = 0;
-      end++;
-    }
-    else
-      end = value + StrLen(value);
-
     //"%s=%s;\n", key, value;
 
     if (0) {}
+    else if (!StrCmp(key, "name")) { Free(pinf->package_name); pinf->package_name = StrNew(value); }
     else if (!StrCmp(key, "pkgmin")) { pinf->pkgmin = Str2I64(value); }
     else if (!StrCmp(key, "release")) { pinf->release = Str2I64(value); }
     else if (!StrCmp(key, "osmin")) { pinf->osmin = Str2I64(value); }
     else if (!StrCmp(key, "osmax")) { pinf->osmax = Str2I64(value); }
     else if (!StrCmp(key, "size")) { pinf->size = Str2I64(value); }
-    else if (!StrCmp(key, "version")) { pinf->version = StrNew(value); }
-    else if (!StrCmp(key, "installdir")) { pinf->installdir = StrNew(value); }
-    else if (!StrCmp(key, "iso.c")) { pinf->iso_c = StrNew(value); }
+    else if (!StrCmp(key, "version")) { Free(pinf->version); pinf->version = StrNew(value); }
+    else if (!StrCmp(key, "installdir")) { Free(pinf->installdir); pinf->installdir = StrNew(value); }
+    else if (!StrCmp(key, "iso.c")) { Free(pinf->iso_c); pinf->iso_c = StrNew(value); }
     else { /* unrecognized keys are simply ignored */ }
 
     key = end;
@@ -111,6 +112,7 @@ I64 PkgWriteManifest(CPkgInfo* pinf, U8* path) {
 // Downloads a package info from the repository.
 // Returns 0 or error code
 I64 PkgFetchManifest(CPkgInfo* pinf, U8* package_name) {
+  // Old packages didn't have to specify a name, so we'll keep this for now
   pinf->package_name = StrNew(package_name);
 
   U8* url = MStrPrint("%s/%s", PKG_BASE_URL, package_name);
@@ -140,11 +142,11 @@ U8* PkgAllocISOCUrl(CPkgInfo* pinf) {
     return MStrPrint("%s/%s", PKG_BASE_URL, pinf->iso_c);
 }
 
-// Check if the package is installable IN GENERAL.
+// Check if the package metadata makes it viable for installation.
 // You still need to do PkgCheckCompatibility, dependency resolution,
-// and check for a suitable download format.
+// and check for a suitable installable format.
 Bool PkgIsInstallable(CPkgInfo* pinf) {
-  return pinf->version != NULL && pinf->installdir != NULL;
+  return pinf->package_name != NULL && pinf->version != NULL && pinf->installdir != NULL;
 }
 
 // Check if the package is compatible with this OS & Pkg version
@@ -186,9 +188,9 @@ I64 PkgRegister(CPkgInfo* pinf) {
 }
 
 // Install a package, using the provided ISO.C file.
-// This will also registers the package as installed.
+// This will also register the package as installed.
 I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
-  if (pinf->installdir == NULL)
+  if (pinf->package_name == NULL || pinf->installdir == NULL)
     return PKG_EUNSUITABLE;
 
   I64 error = 0;
@@ -205,7 +207,7 @@ I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
 
     CopyTree(src_path, pinf->installdir);
 
-    // Mark package as installed
+    // Register package as installed
     error = PkgRegister(pinf);
   }
   else
@@ -264,6 +266,8 @@ static U8* FormatSize(I64 size) {
 
 // Install a package using a local manifest file
 public I64 PkgInstallFromFile(U8* manifest_path) {
+  DirMk(PKG_LOCAL_REPO);
+
   CPkgInfo pinf;
   PkgInfoInit(&pinf);
 
@@ -280,7 +284,7 @@ public I64 PkgInstallFromFile(U8* manifest_path) {
       PkgInstallISOC(&pinf, pinf.iso_c);
     }
     else {
-      "$FG,6$No suitable installation file. Package broken?\n";
+      "$FG,6$No suitable installable file. Package broken?\n";
       error = PKG_EUNSUITABLE;
     }
   }
@@ -416,6 +420,9 @@ public I64 PkgMakeFromDir(U8* manifest_path, U8* src_dir) {
       "$FG,6$No output file defined.\n";
       error = PKG_EUNSUITABLE;
     }
+  }
+  else {
+    "$FG,4$PkgParseManifest error: %d\n$FG$", error;
   }
 
   PkgInfoFree(&pinf);
