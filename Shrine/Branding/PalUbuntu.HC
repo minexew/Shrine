@@ -5,3 +5,4 @@ CBGR48 gr_palette_ubuntu[COLORS_NUM]={
 0xefef29292929,0xadad7f7fa8a8,0xfcfce9e94f4f,0xeeeeeeeeecec};
 
 GrPaletteSet(gr_palette_ubuntu);
+Adam("DefineLoad(\"USER_PALETTE\", \"Ubuntu\");");
