@@ -36,6 +36,9 @@ import time
 TCP_IP = '127.0.0.1'
 TCP_PORT = 7770
 
+CHUNK_SIZE = 8
+BAUD = 19200
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((TCP_IP, TCP_PORT))
 
@@ -79,10 +82,9 @@ def do_command(*argv):
             send('S' + str(size))
 
             while len(data):
-                sock.send(data[0:1])
-                data = data[1:]
-                # for 9600 baud
-                time.sleep(0.001)
+                sock.send(data[0:CHUNK_SIZE])
+                data = data[CHUNK_SIZE:]
+                time.sleep(float(CHUNK_SIZE) * 8 / BAUD)
 
         print('Read', size, 'bytes from', local_filename)
     elif cmd == 'list':
