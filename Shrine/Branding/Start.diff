@@ -1,13 +1,12 @@
 diff --git a/../TempleOS/TempleOSCD/Doc/Start.DD b/Patched/Doc/Start.DD
-index 4db863e..e1d08a6 100644
+index 0af030b..7bce4e4 100644
 --- a/../TempleOS/TempleOSCD/Doc/Start.DD
 +++ b/Patched/Doc/Start.DD
-@@ -1,4 +1,7 @@
--$WW+H,1$$FG,5$$TX+CX,"TempleOS V5.02",D="DD_OS_NAME_VERSION"$$FG$
+@@ -1,4 +1,6 @@
+-$WW+H,1$$FG,5$$TX+CX,"TempleOS V5.03",D="DD_OS_NAME_VERSION"$$FG$
 +
 +$WW+H,1$$FG,3$$TX+CX,"Shrine",D="DD_OS_NAME_VERSION"$$FG$
 +$WW+H,1$$FG,5$$TX+CX,"based on TempleOS by Terry A. Davis"$$FG$
-+$WW+H,1$$FG,4$$TX+CX,"DEVELOPMENT RELEASE - EXPERIMENTAL!"$$FG$
  
  $TX+CX,"Public Domain Operating System"$
  
