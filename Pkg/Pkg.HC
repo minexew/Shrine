@@ -11,7 +11,7 @@
 
 #define PKG_VERSION     10
 
-static U8* PKG_BASE_URL =     "http://shrineupd.ddns.net:8000/packages";
+static U8* PKG_BASE_URL =     "http://shrineupd.clanweb.eu/packages";
 static U8* PKG_LOCAL_REPO =   "::/Misc/Packages";
 static U8* PKG_TMP_DIR =      "::/Tmp/PkgTmp";
 
