@@ -33,32 +33,36 @@ I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
       I64 sock = HttpOpenGet(curl.host, curl.port, curl.path, &size);
 
       if (sock > 0) {
-        U8* data = MAlloc(1 + size);
-        I64 total = 0;
-        I64 progress = 0;
-        "[$FG,3$";
+        if (size >= 0) {
+          U8* data = MAlloc(1 + size);
+          I64 total = 0;
+          I64 progress = 0;
+          "[$FG,3$";
 
-        while (total < size) {
-          I64 step = size - total;
+          while (total < size) {
+            I64 step = size - total;
 
-          if (step > 1024)
-            step = 1024;
+            if (step > 1024)
+              step = 1024;
 
-          I64 got = recv(sock, data + total, step, 0);
+            I64 got = recv(sock, data + total, step, 0);
 
-          if (got <= 0) {
-            error = HTTP_EEOF;
-            break;
-          }
+            if (got <= 0) {
+              error = HTTP_EEOF;
+              break;
+            }
 
-          total += got;
+            total += got;
 
-          I64 new_progress = (20 * total + size - 1) / size;
-          while (progress < new_progress) {
-            '' 0xfe;
-            progress++;
+            I64 new_progress = (20 * total + size - 1) / size;
+            while (progress < new_progress) {
+              '' 0xfe;
+              progress++;
+            }
           }
         }
+        else
+          error = HTTP_ECONTENTLENGTH;
 
         close(sock);
 
