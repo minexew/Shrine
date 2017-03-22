@@ -103,6 +103,7 @@ I64 PkgParseManifest(CPkgInfo* pinf, U8* manifest) {
 I64 PkgWriteManifest(CPkgInfo* pinf, U8* path) {
   // TODO: implement
 
+  no_warn pinf;
   FileWrite(path, "", 0);
   return 0;
 }
