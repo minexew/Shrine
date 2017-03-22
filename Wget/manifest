@@ -2,7 +2,7 @@ name	wget
 website	https://github.com/minexew/Shrine
 pkgmin	10
 iso.c	::/Tmp/Wget.ISO.C
-osmin	502
-version	5.02.0
-release	5020
+osmin	503
+version	5.03.0
+release	5030
 installdir	::/Apps

@@ -280,13 +280,23 @@ public I64 PkgInstallFromFile(U8* manifest_path) {
   I64 error = PkgParseManifest(&pinf, manifest_file);
 
   if (error == 0) {
-    if (pinf.iso_c) {
-      PkgInstallISOC(&pinf, pinf.iso_c);
+    error = PkgCheckCompatibility(&pinf);
+
+    if (!error) {
+      if (pinf.iso_c) {
+        PkgInstallISOC(&pinf, pinf.iso_c);
+      }
+      else {
+        "$FG,6$No suitable installable file. Package broken?\n";
+        error = PKG_EUNSUITABLE;
+      }
     }
     else {
-      "$FG,6$No suitable installable file. Package broken?\n";
-      error = PKG_EUNSUITABLE;
+      "$FG,4$PkgCheckCompatibility error: %d\n$FG$", error;
     }
+  }
+  else {
+    "$FG,4$PkgParseManifest error: %d\n$FG$", error;
   }
 
   PkgInfoFree(&pinf);
