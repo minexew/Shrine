@@ -146,42 +146,52 @@ I64 HttpOpenGet(U8* host, U16 port = 0, U8* path, I64* len_out,
 }
 
 I64 HttpGet(U8* host, U16 port = 0, U8* path, U8** data_out = NULL, I64* len_out = NULL) {
+  I64 error = 0;
   I64 len = 0;
   I64 sock = HttpOpenGet(host, port, path, &len);
 
-  if (sock < 0)
-    return sock;
+  if (sock > 0) {
+    if (len >= 0) {
+      U8* data = MAlloc(1 + len);
+      I64 total = 0;
 
-  // We currently don't handle chunked encoding
-  if (len < 0) {
-    close(sock);
-    return HTTP_ECONTENTLENGTH;
-  }
+      while (total < len) {
+        I64 step = len - total;
 
-  if (data_out) {
-    U8* data = MAlloc(1 + len);
-    I64 got = recvall(sock, data, len, 0);
-    close(sock);
+        if (step > 1024)
+          step = 1024;
 
-    if (got >= 0)
-      data[got] = 0;
-    else
-      data[0] = 0;
+        I64 got = recv(sock, data + total, step, 0);
 
-    if (got != len) {
-      Free(data);
-      *data_out = 0;
-      return -1;
+        if (got <= 0) {
+          error = HTTP_EEOF;
+          break;
+        }
+
+        total += got;
+      }
     }
+    else
+      // We currently don't handle dynamic-length HTTP responses
+      error = HTTP_ECONTENTLENGTH;
 
-    *data_out = data;
-  }
-  else {
     close(sock);
+
+    if (error) {
+      Free(data);
+    }
+    else {
+      if (data_out) {
+        data[total] = 0;
+        *data_out = data;
+      }
+
+      if (len_out)
+        *len_out = len;
+    }
   }
+  else
+    error = sock;
 
-  if (len_out)
-    *len_out = len;
-
-  return 0;
+  return error;
 }

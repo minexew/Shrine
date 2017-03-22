@@ -69,13 +69,13 @@ I64 UrlGetWithProgress(U8* url, U8** data_out, I64* size_out) {
         if (error) {
           "$FG,4$x\n$FG$";
           Free(data);
-          return error;
         }
-
-        "$FG$]\n";
-        data[total] = 0;
-        *data_out = data;
-        *size_out = total;
+        else {
+          "$FG$]\n";
+          data[total] = 0;
+          *data_out = data;
+          *size_out = total;
+        }
       }
       else
         error = sock;
