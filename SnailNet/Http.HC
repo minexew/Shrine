@@ -170,25 +170,25 @@ I64 HttpGet(U8* host, U16 port = 0, U8* path, U8** data_out = NULL, I64* len_out
 
         total += got;
       }
+
+      if (error) {
+        Free(data);
+      }
+      else {
+        if (data_out) {
+          data[total] = 0;
+          *data_out = data;
+        }
+
+        if (len_out)
+          *len_out = len;
+      }
     }
     else
       // We currently don't handle dynamic-length HTTP responses
       error = HTTP_ECONTENTLENGTH;
 
     close(sock);
-
-    if (error) {
-      Free(data);
-    }
-    else {
-      if (data_out) {
-        data[total] = 0;
-        *data_out = data;
-      }
-
-      if (len_out)
-        *len_out = len;
-    }
   }
   else
     error = sock;
