@@ -1,3 +1,4 @@
+name	lsh
 website	https://github.com/minexew/Shrine
 pkgmin	10
 iso.c	::/Tmp/Lsh.ISO.C

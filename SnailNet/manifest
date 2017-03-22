@@ -1,3 +1,4 @@
+name	snailnet
 website	https://github.com/minexew/Shrine
 pkgmin	10
 iso.c	::/Tmp/SnailNet.ISO.C

@@ -1,3 +1,4 @@
+name	hwsupp
 website	https://github.com/minexew/Shrine
 pkgmin	10
 iso.c	::/Tmp/HwSupp.ISO.C
