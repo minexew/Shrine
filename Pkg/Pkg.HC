@@ -100,8 +100,12 @@ I64 PkgParseManifest(CPkgInfo* pinf, U8* manifest) {
   return 0;
 }
 
-/*I64 PkgWriteManifest(CPkgInfo* pinf, U8* path) {
-}*/
+I64 PkgWriteManifest(CPkgInfo* pinf, U8* path) {
+  // TODO: implement
+
+  FileWrite(path, "", 0);
+  return 0;
+}
 
 // Downloads a package info from the repository.
 // Returns 0 or error code
@@ -167,8 +171,21 @@ I64 PkgCheckCompatibility(CPkgInfo* pinf) {
   return 0;
 }
 
+I64 PkgRegister(CPkgInfo* pinf) {
+  // TODO: this is very preliminary
+
+  if (pinf->package_name == NULL)
+    return PKG_EUNSUITABLE;
+
+  U8* path = MStrPrint("%s/%s", PKG_LOCAL_REPO, pinf->package_name);
+
+  PkgWriteManifest(pinf, path);
+
+  return 0;
+}
+
 // Install a package, using the provided ISO.C file.
-// TODO: This will also register the package as installed.
+// This will also registers the package as installed.
 I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
   if (pinf->installdir == NULL)
     return PKG_EUNSUITABLE;
@@ -186,6 +203,9 @@ I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
       DirMk(pinf->installdir);
 
     CopyTree(src_path, pinf->installdir);
+
+    // Mark package as installed
+    error = PkgRegister(pinf);
   }
   else
     error = PKG_EMOUNT;
