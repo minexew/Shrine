@@ -61,6 +61,8 @@ put	/Tmp/Shrine/Adam/ADefine.HC.Z	Shrine/Patched/Adam/ADefine.HC
 put	/Tmp/Shrine/Adam/MakeAdam.HC.Z	Shrine/Patched/Adam/MakeAdam.HC
 put	/Tmp/Shrine/Doc/Start.DD.Z	Shrine/Patched/Doc/Start.DD
 put	/Tmp/Shrine/Misc/DoDistro.HC.Z	Shrine/Patched/Misc/DoDistro.HC
+put	/Tmp/Shrine/Misc/PalConEmu.HC.Z	Shrine/Branding/PalConEmu.HC
+put	/Tmp/Shrine/Misc/PalMonokai.HC.Z	Shrine/Branding/PalMonokai.HC
 put	/Tmp/Shrine/Misc/PalUbuntu.HC.Z	Shrine/Branding/PalUbuntu.HC
 put	/Tmp/Shrine.MF	Shrine/manifest
 command	PkgMakeFromDir("/Tmp/Shrine.MF", "/Tmp/Shrine");
