@@ -164,30 +164,140 @@ U0 TransformCommand(U8* command, U8* exec_buf) {
 }
 
 // -------------------------------------
-// Shell
+// Autocomplete
 
-Bool skip_intro = FALSE;
+class CHashTableIter {
+  CHashTable* ht;
+  I64 i;
+  CHash* curr;
+  I64 recursive;
+};
+
+U0 HashTableIterBegin(CHashTableIter* it, CHashTable* ht, I64 recursive) {
+  it->ht = ht;
+  it->i = 0;
+  it->curr = NULL;
+  it->recursive = recursive;
+}
+
+CHash* HashTableIterNext(CHashTableIter* it) {
+  // End of current bucket?
+  while (!it->curr) {
+    // End of hash table?
+    while (it->i >= it->ht->mask) {
+      // If recursive search is enabled,
+      // jump to the next table in chain
+      if (it->recursive) {
+        if (!it->ht->next)
+          return NULL;
+
+        it->ht = it->ht->next;
+        it->i = 0;
+      }
+      else
+        return NULL;
+    }
+
+    it->curr = it->ht->body[it->i];
+    it->i++;
+  }
+
+  CHash* ret = it->curr;
+  it->curr = it->curr->next;
+  return ret;
+}
+
+class CAutocompleteIter {
+  U8* query;
+  I64 length;
+  CDirEntry* entries;
+  CDirEntry* de;
+  CHashTableIter hti;
+};
+
+class CAutocompleteResult {
+  // Exactly one of these will be set
+  CDirEntry* de;
+  CHashFun* fun;
+};
+
+U0 AutocompleteIterRewind(CAutocompleteIter* it) {
+  it->de = it->entries;
+  HashTableIterBegin(&it->hti, Fs->hash_table, TRUE);
+}
+
+U0 AutocompleteIterBegin(CAutocompleteIter* it, U8* query) {
+  it->query = query;
+  it->length = StrLen(query);
+
+  U8* mask = MStrPrint("%s*", query);
+  try {
+    it->entries = FilesFind(mask);
+  }
+  catch {
+    it->entries = NULL;
+  }
+  Free(mask);
+
+  AutocompleteIterRewind(it);
+}
+
+I64 AutocompleteIterNext(CAutocompleteIter* it, CAutocompleteResult* out) {
+  // Go through all file matches first
+  while (it->de) {
+    if (it->de->name[0] != '.') {
+      // Return the DE, iteration will resume at the next one
+      out->de = it->de;
+      out->fun = NULL;
+      it->de = it->de->next;
+      return TRUE;
+    }
+
+    it->de = it->de->next;
+  }
+
+  // Go through all hashtable matches
+  CHash* next;
+  while ((next = HashTableIterNext(&it->hti))) {
+    // Function?
+    if ((next->type & HTT_FUN) != 0
+        && !MemCmp(next->str, it->query, it->length)) {
+      out->de = NULL;
+      out->fun = next(CHashFun*);
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+U0 AutocompleteIterEnd(CAutocompleteIter* it) {
+  DirTreeDel(it->entries);
+}
+
 
 // No matches -> return 0
 // 1 match -> return 1, set *p_match to alloced
 // multiple matches -> print matches, return count
 I64 Autocomplete(U8* buffer) {
-  U8* mask = MStrPrint("%s*", buffer);
-  CDirEntry* de;
-  try {
-    de = FilesFind(mask);
-  }
-  catch {
-    de = NULL;
-  }
-  Free(mask);
+  // This is somewhat complicated, because we want
+  // to avoid any unnecessary allocations.
 
-  if (!de)
+  CAutocompleteIter it;
+  CAutocompleteResult first, next;
+
+  AutocompleteIterBegin(&it, buffer);
+
+  if (!AutocompleteIterNext(&it, &first)) {
+    // No results.
     return 0;
+  }
 
-  I64 count = LinkedLstCnt(de);
+  I64 count;
 
-  if (count == 1) {
+  if (!AutocompleteIterNext(&it, &next)) {
+    // Single result.
+
     // Completing path or last argument?
     U8* start = StrLastOcc(buffer, "/");
 
@@ -196,25 +306,40 @@ I64 Autocomplete(U8* buffer) {
     else
       start = buffer;
 
-    StrCpy(start, de->name);
+    if (first.de)
+      StrCpy(start, first.de->name);
+    else if (first.fun)
+      StrCpy(start, first.fun->str);
+
+    count = 1;
   }
   else {
-    CDirEntry* de2 = de;
-    I64 shown = 0;
+    AutocompleteIterRewind(&it);
+
+    count = 0;
     "\n";
-    while (shown < AUTOCOMPLETE_MAX_RESULTS && de2) {
-      if (de2->name[0] != '.') {
-        "%s\n", de2->name;
-        shown++;
-      }
-      de2 = de2->next;
+
+    while (count < AUTOCOMPLETE_MAX_RESULTS
+        && AutocompleteIterNext(&it, &next)) {
+      if (next.de)
+        "$FG,4$%s\n", next.de->name;
+      else if (next.fun)
+        "$FG,3$%s\n", next.fun->str;
+      count++;
     }
-    if (de2)
+
+    if (AutocompleteIterNext(&it, &next))
       "$FG,6$Too many results, display truncated\n$FG$";
   }
-  DirTreeDel(de);
+
+  AutocompleteIterEnd(&it);
   return count;
 }
+
+// -------------------------------------
+// Shell
+
+Bool skip_intro = FALSE;
 
 U8* DirCurShort() {
   U8* dir = DirCur();
