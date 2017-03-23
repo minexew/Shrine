@@ -84,14 +84,13 @@ show_prompt:
 
       // Find matching results
       I64 results = autocomplete(start);
+      len = StrLen(buf);
 
-      // Exactly one?
-      if (results == 1) {
-        len = StrLen(buf);
-      }
-      else {
-        Sleep(200); //UGH!!
-      }
+      // If multiple results were printed,
+      // we need to wait for the WinMgr (or whoever)
+      // to catch up. UGH!
+      if (results > 1)
+        Sleep(200);
 
       EdLineDel(DocPut);
       goto show_prompt;
@@ -261,7 +260,7 @@ I64 AutocompleteIterNext(CAutocompleteIter* it, CAutocompleteResult* out) {
   while ((next = HashTableIterNext(&it->hti))) {
     // Function?
     if ((next->type & HTT_FUN) != 0
-        && !MemCmp(next->str, it->query, it->length)) {
+        && !StrNICmp(next->str, it->query, it->length)) {
       out->de = NULL;
       out->fun = next(CHashFun*);
       return TRUE;
@@ -275,6 +274,28 @@ U0 AutocompleteIterEnd(CAutocompleteIter* it) {
   DirTreeDel(it->entries);
 }
 
+U0 AutocompleteSetResult(U8* buffer, U8* str, I64 length) {
+  // Completing path or last argument?
+  U8* start = StrLastOcc(buffer, "/");
+
+  if (start)
+    start++;
+  else
+    start = buffer;
+
+  MemCpy(start, str, length);
+  start[length] = 0;
+}
+
+I64 StrCommonSubset(U8* a, U8* b) {
+  I64 len = 0;
+  while (*a && *b == *a) {
+    a++;
+    b++;
+    len++;
+  }
+  return len;
+}
 
 // No matches -> return 0
 // 1 match -> return 1, set *p_match to alloced
@@ -294,26 +315,24 @@ I64 Autocomplete(U8* buffer) {
   }
 
   I64 count;
+  U8* str;
 
   if (!AutocompleteIterNext(&it, &next)) {
     // Single result.
 
-    // Completing path or last argument?
-    U8* start = StrLastOcc(buffer, "/");
-
-    if (start)
-      start++;
-    else
-      start = buffer;
-
     if (first.de)
-      StrCpy(start, first.de->name);
+      str = first.de->name;
     else if (first.fun)
-      StrCpy(start, first.fun->str);
+      str = first.fun->str;
+
+    AutocompleteSetResult(buffer, str, StrLen(str));
 
     count = 1;
   }
   else {
+    U8* common_base = NULL;
+    I64 common_length = 0;
+
     AutocompleteIterRewind(&it);
 
     count = 0;
@@ -321,15 +340,32 @@ I64 Autocomplete(U8* buffer) {
 
     while (count < AUTOCOMPLETE_MAX_RESULTS
         && AutocompleteIterNext(&it, &next)) {
-      if (next.de)
-        "$FG,4$%s\n", next.de->name;
-      else if (next.fun)
-        "$FG,3$%s\n", next.fun->str;
+      if (next.de) {
+        str = next.de->name;
+        "$FG,4$%s\n", str;
+      }
+      else if (next.fun) {
+        str = next.fun->str;
+        "$FG,3$%s\n", str;
+      }
+
+      if (!common_base) {
+        common_base = str;
+        common_length = StrLen(common_base);
+      }
+      else {
+        I64 new_common = StrCommonSubset(common_base, str);
+        if (common_length > new_common)
+          common_length = new_common;
+      }
+
       count++;
     }
 
     if (AutocompleteIterNext(&it, &next))
       "$FG,6$Too many results, display truncated\n$FG$";
+    else if (common_length > StrLen(buffer))
+      AutocompleteSetResult(buffer, common_base, common_length);
   }
 
   AutocompleteIterEnd(&it);
