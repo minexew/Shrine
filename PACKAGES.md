@@ -20,6 +20,9 @@ The manifest is a key-value format, using exactly one Tab character as delimiter
  - `installdir` (string, default *NULL*)
  - `iso.c` (string - see below, default *NULL*)
  - `size` (int - download size in bytes, default 0)
+ - `post-install-doc` (string, default *NULL*)
+
+   Name of file to open after package installation. Must be an absolute path.
 
 Currently ignored keys:
 
@@ -37,7 +40,17 @@ This is somewhat confusing, which makes it a perfect fit for TempleOS.
 
 `size` is ambiguous if the package provides multiple download formats. It's not a big deal.
 
+pkgmin
+------
+
+To maximize compatibility with systems in the wild, you should generally use the lowest `pkgmin` that's suitable for your package.
+
+Format versions are described below:
+
+ - 10 - Initial public release
+ - 11 - Adds support for `post-install-doc` (Shrine 5.03.1)
+
 Dependency resolution
 ---------------------
 
-...is not implemented on purpose, to keep things simple.
+...is omitted on purpose, to keep things simple.

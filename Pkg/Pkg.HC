@@ -9,7 +9,7 @@
 #define PKG_EOSVERSION  (-20005)
 #define PKG_EUNSUITABLE (-20006)
 
-#define PKG_VERSION     10
+#define PKG_VERSION     11
 
 static U8* PKG_BASE_URL =     "http://shrineupd.clanweb.eu/packages";
 static U8* PKG_LOCAL_REPO =   "::/Misc/Packages";
@@ -25,6 +25,7 @@ class CPkgInfo {
   U8*   version;
   U8*   installdir;
   U8*   iso_c;
+  U8*   post_install_doc;
 };
 
 // TODO: Is there a built-in for this?
@@ -49,6 +50,7 @@ U0 PkgInfoInit(CPkgInfo* pinf) {
   pinf->version = 0;
   pinf->installdir = 0;
   pinf->iso_c = 0;
+  pinf->post_install_doc = 0;
 }
 
 U0 PkgInfoFree(CPkgInfo* pinf) {
@@ -56,6 +58,7 @@ U0 PkgInfoFree(CPkgInfo* pinf) {
   Free(pinf->version);
   Free(pinf->installdir);
   Free(pinf->iso_c);
+  Free(pinf->post_install_doc);
   PkgInfoInit(pinf);
 }
 
@@ -93,6 +96,7 @@ I64 PkgParseManifest(CPkgInfo* pinf, U8* manifest) {
     else if (!StrCmp(key, "version")) { Free(pinf->version); pinf->version = StrNew(value); }
     else if (!StrCmp(key, "installdir")) { Free(pinf->installdir); pinf->installdir = StrNew(value); }
     else if (!StrCmp(key, "iso.c")) { Free(pinf->iso_c); pinf->iso_c = StrNew(value); }
+    else if (!StrCmp(key, "post-install-doc")) { Free(pinf->post_install_doc); pinf->post_install_doc = StrNew(value); }
     else { /* unrecognized keys are simply ignored */ }
 
     key = end;
@@ -209,6 +213,11 @@ I64 PkgInstallISOC(CPkgInfo* pinf, U8* iso_c) {
 
     // Register package as installed
     error = PkgRegister(pinf);
+
+    // Display post-install doc
+    if (pinf->post_install_doc) {
+      Ed(pinf->post_install_doc);
+    }
   }
   else
     error = PKG_EMOUNT;
