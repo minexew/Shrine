@@ -4,3 +4,6 @@
 [submodule "TempleOS"]
 	path = TempleOS
 	url = https://github.com/minexew/TempleOS.git
+[submodule "Lsh"]
+	path = Lsh
+	url = https://github.com/minexew/Lsh.git

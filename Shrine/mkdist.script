@@ -32,7 +32,7 @@ command	PkgMakeFromDir("/Tmp/HwSupp.MF", "/Tmp/HwSupp");
 
 # Lsh
 put	/Tmp/Lsh.HC.Z	Lsh/Lsh.HC
-put	/Tmp/Lsh.MF	Lsh/manifest
+put	/Tmp/Lsh.MF	Lsh/Lsh.MF
 command	PkgMakeFromFile("/Tmp/Lsh.MF", "/Tmp/Lsh.HC.Z");
 #list	/Tmp/Lsh.ISO.C	PkgBin/Lsh.ISO.C
 #list	/Tmp/Lsh.MF	PkgBin/Lsh.MF

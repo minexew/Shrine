@@ -1,8 +1,0 @@
-name	lsh
-website	https://github.com/minexew/Shrine
-pkgmin	10
-iso.c	::/Tmp/Lsh.ISO.C
-osmin	503
-version	5.03.1
-release	5031
-installdir	::/Apps
