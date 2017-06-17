@@ -10,10 +10,6 @@ During the process, the TOS ISO is first patched to enable an unattended install
 - use the following commands
 
 ```
-# This only needs to be done once
-git submodule update --init --recursive
-git apply isoparser.patch
-
 # Some files are provided as diffs against stock TempleOS, this generates the full files
 cd AutoOSInstall && ./apply-patches.sh && cd ..
 cd Shrine && ./apply-patches.sh && cd ..
@@ -21,7 +17,7 @@ cd Shrine && ./apply-patches.sh && cd ..
 # Finally run the machinery
 qemu-img create -f qcow2 ~/shrine.img 2G
 mkdir PkgBin
-./make-dist.py TempleOSCD.ISO Shrine ~/shrine.img 
+./make-dist.py TOS_Distro.ISO Shrine ~/shrine.img
 ```
 
 The output will be `Shrine-HEAD.iso`.

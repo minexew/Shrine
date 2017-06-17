@@ -1,28 +1,22 @@
-#!/usr/bin/env python
-
-from __future__ import print_function
+#!/usr/bin/env python3
 
 import sys
-sys.path.append('isoparser')
+sys.path.append('redseafs')
 
-import errno
-import isoparser
-import os
-import subprocess
+from isoc import RedSea
 
 ISO_FILE = sys.argv[1]
 PATH_TO_REPLACE = sys.argv[2]
 REPLACEMENT_FILE = sys.argv[3]
 
-iso = isoparser.parse(ISO_FILE)
+iso = RedSea(ISO_FILE)
 
 with open(REPLACEMENT_FILE, 'rb') as f:
     data = f.read()
 
-record = iso.record(*[s.encode() for s in PATH_TO_REPLACE.split('/')])
-patches = record.generate_patchset(data)
+patches = iso.generate_patchset('/' + PATH_TO_REPLACE, data)
 
-iso.close()
+del(iso)
 
 with open(ISO_FILE, 'rb+') as isof:
     for offset, orig, new in patches:

@@ -115,7 +115,7 @@ command	DelTree("/Tmp");
 command	DirMk("/Tmp");
 
 command	#include "/Misc/DoDistro";
-list	/Tmp/ShrineDist.ISO	Shrine-HEAD.iso
+list	/Tmp/ShrineDist.ISO.C	Shrine-HEAD.iso
 
 command	Reboot;
 wait	1
