@@ -215,8 +215,8 @@ static I64 PCNetAllocBuffers() {
   I64 rdes_size = PCNET_DE_SIZE * rx_buffer_count;
   I64 tdes_size = PCNET_DE_SIZE * tx_buffer_count;
 
-  rdes_phys = MAlloc(rdes_size);
-  tdes_phys = MAlloc(tdes_size);
+  rdes_phys = MAlloc(rdes_size, Fs->code_heap);
+  tdes_phys = MAlloc(tdes_size, Fs->code_heap);
 
   if (rdes_phys + rdes_size > 0x100000000 || tdes_phys + tdes_size > 0x100000000) {
     "$FG,4$PCNetAllocBuffers: rdes_phys=%08Xh tdes_phys=%08Xh\n$FG$", rdes_phys, tdes_phys;
@@ -230,8 +230,8 @@ static I64 PCNetAllocBuffers() {
   I64 tx_buffers_size = ETHERNET_FRAME_SIZE * tx_buffer_count;
 
   // TODO: shouldn't these be uncached as well?
-  rx_buffers = MAlloc(rx_buffers_size);
-  tx_buffers = MAlloc(tx_buffers_size);
+  rx_buffers = MAlloc(rx_buffers_size, Fs->code_heap);
+  tx_buffers = MAlloc(tx_buffers_size, Fs->code_heap);
 
   if (rx_buffers + rx_buffers_size > 0x100000000 || tx_buffers + tx_buffers_size > 0x100000000) {
     "$FG,4$PCNetAllocBuffers: rx_buffers=%08Xh tx_buffers=%08Xh\n$FG$", rx_buffers, tx_buffers;
@@ -310,7 +310,7 @@ static U0 PCNetInit(I64 bus, I64 dev_, I64 fun) {
   if (PCNetAllocBuffers() < 0)
     return;
 
-  U8* setup = MAlloc(sizeof(CPCNetBufferSetup));
+  U8* setup = MAlloc(sizeof(CPCNetBufferSetup), Fs->code_heap);
   CPCNetBufferSetup* u_setup = setup + dev.uncached_alias;
 
   u_setup->mode = 0;     // see CSR15 in spec
