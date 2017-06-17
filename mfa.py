@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 mfa - minimalist file access for TempleOS
@@ -26,8 +26,6 @@ command OSInstall(FALSE);
 test
 
 '''
-
-from __future__ import print_function
 
 import socket
 import sys

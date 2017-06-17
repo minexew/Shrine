@@ -54,11 +54,15 @@ command	PkgMakeFromFile("/Tmp/Pkg.MF", "/Tmp/Pkg.HC.Z");
 # Shrine
 command	DirMk("/Tmp/Shrine");
 command	DirMk("/Tmp/Shrine/Adam");
+command	DirMk("/Tmp/Shrine/Demo/Network");
 command	DirMk("/Tmp/Shrine/Doc");
 command	DirMk("/Tmp/Shrine/Misc");
 put	/Tmp/Shrine/Once.HC.Z	Shrine/Patched/Once.HC
 put	/Tmp/Shrine/Adam/ADefine.HC.Z	Shrine/Patched/Adam/ADefine.HC
 put	/Tmp/Shrine/Adam/MakeAdam.HC.Z	Shrine/Patched/Adam/MakeAdam.HC
+put	/Tmp/Shrine/Demo/Network/TcpEchoClient.HC.Z	Demo/Network/TcpEchoClient.HC
+put	/Tmp/Shrine/Demo/Network/UdpListen.HC.Z	Demo/Network/UdpListen.HC
+put	/Tmp/Shrine/Demo/Network/UdpSend.HC.Z	Demo/Network/UdpSend.HC
 put	/Tmp/Shrine/Doc/Start.DD.Z	Shrine/Patched/Doc/Start.DD
 put	/Tmp/Shrine/Kernel/KGlbls.HC.Z	Shrine/Patched/Kernel/KGlbls.HC
 put	/Tmp/Shrine/Misc/DoDistro.HC.Z	Shrine/Patched/Misc/DoDistro.HC
