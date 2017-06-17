@@ -60,6 +60,7 @@ put	/Tmp/Shrine/Once.HC.Z	Shrine/Patched/Once.HC
 put	/Tmp/Shrine/Adam/ADefine.HC.Z	Shrine/Patched/Adam/ADefine.HC
 put	/Tmp/Shrine/Adam/MakeAdam.HC.Z	Shrine/Patched/Adam/MakeAdam.HC
 put	/Tmp/Shrine/Doc/Start.DD.Z	Shrine/Patched/Doc/Start.DD
+put	/Tmp/Shrine/Kernel/KGlbls.HC.Z	Shrine/Patched/Kernel/KGlbls.HC
 put	/Tmp/Shrine/Misc/DoDistro.HC.Z	Shrine/Patched/Misc/DoDistro.HC
 put	/Tmp/Shrine/Misc/PalConEmu.HC.Z	Shrine/Branding/PalConEmu.HC
 put	/Tmp/Shrine/Misc/PalMonokai.HC.Z	Shrine/Branding/PalMonokai.HC

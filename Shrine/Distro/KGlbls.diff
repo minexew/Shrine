@@ -1,0 +1,7 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/KGlbls.HC b/Patched/Kernel/KGlbls.HC
+index df09c62..977d075 100644
+--- a/../TempleOS/TempleOSCD/Kernel/KGlbls.HC
++++ b/Patched/Kernel/KGlbls.HC
+@@ -16 +16 @@ F64	*pow10_I64,
+-	sys_os_version=5.030;
++	sys_os_version=5.040;
