@@ -35,8 +35,14 @@ I64 TcpEchoClient(U8* dest_address) {
 
   U8 buffer[2048 + 1];
   count = recv(sock, buffer, sizeof(buffer) - 1, 0);
-  buffer[count] = 0;
-  "$FG,8$Received %d bytes:\n$FG$%s\n", count, buffer;
+
+  if (count <= 0) {
+    "$FG,6$recv: error %d\n$FG$", count;
+  }
+  else {
+    buffer[count] = 0;
+    "$FG,8$Received %d bytes:\n$FG$%s\n", count, buffer;
+  }
 
   close(sock);
   return 0;
