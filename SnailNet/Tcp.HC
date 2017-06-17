@@ -368,6 +368,13 @@ static U0 TcpSocketCheckSendBufs(CTcpSocket* s) {
   }
 }
 
+I64 TcpSocketAccept(CTcpSocket* s, sockaddr* addr, I64 addrlen) {
+  no_warn s;
+  no_warn addr;
+  no_warn addrlen;
+  return -1;
+}
+
 I64 TcpSocketBind(CTcpSocket* s, sockaddr* addr, I64 addrlen) {
   // FIXME: implement
   no_warn s;
@@ -439,6 +446,12 @@ I64 TcpSocketConnect(CTcpSocket* s, sockaddr* addr, I64 addrlen) {
     return -1;
 
   return 0;
+}
+
+I64 TcpSocketListen(CTcpSocket* s, I64 backlog) {
+  no_warn s;
+  no_warn backlog;
+  return -1;
 }
 
 I64 TcpSocketRecvfrom(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr* src_addr, I64 addrlen) {
@@ -558,9 +571,11 @@ CTcpSocket* TcpSocket(U16 domain, U16 type) {
     return NULL;
 
   CTcpSocket* s =       MAlloc(sizeof(CTcpSocket));
+  s->sock.accept =      &TcpSocketAccept;
   s->sock.bind =        &TcpSocketBind;
   s->sock.close =       &TcpSocketClose;
   s->sock.connect =     &TcpSocketConnect;
+  s->sock.listen =      &TcpSocketListen;
   s->sock.recvfrom =    &TcpSocketRecvfrom;
   s->sock.sendto =      &TcpSocketSendto;
   s->sock.setsockopt =  &TcpSocketSetsockopt;

@@ -60,9 +60,11 @@ U8* inet_ntoa(in_addr in) {
 }
 
 class CSocket {
+  I64 (*accept)(CSocket* s, sockaddr* src_addr, I64 addrlen);
   I64 (*bind)(CSocket* s, sockaddr* addr, I64 addrlen);
   I64 (*close)(CSocket* s);
   I64 (*connect)(CSocket* s, sockaddr* addr, I64 addrlen);
+  I64 (*listen)(CSocket* s, I64 backlog);
   I64 (*recvfrom)(CSocket* s, U8* buf, I64 len, I64 flags, sockaddr* src_addr, I64 addrlen);
   I64 (*sendto)(CSocket* s, U8* buf, I64 len, I64 flags, sockaddr* dest_addr, I64 addrlen);
   I64 (*setsockopt)(CSocket* s, I64 level, I64 optname, U8* optval, I64 optlen);
@@ -111,6 +113,12 @@ I64 socket(I64 domain, I64 type) {
   else return -1;
 }
 
+I64 accept(I64 sockfd, sockaddr* addr, I64 addrlen) {
+  CSocket* sock = sockfd(CSocket*);
+  if (sockfd > 0) return sock->accept(sock, addr, addrlen);
+  else return -1;
+}
+
 I64 close(I64 sockfd) {
   CSocket* sock = sockfd(CSocket*);
   if (sockfd > 0) return sock->close(sock);
@@ -126,6 +134,12 @@ I64 bind(I64 sockfd, sockaddr* addr, I64 addrlen) {
 I64 connect(I64 sockfd, sockaddr* addr, I64 addrlen) {
   CSocket* sock = sockfd(CSocket*);
   if (sockfd > 0) return sock->connect(sock, addr, addrlen);
+  else return -1;
+}
+
+I64 listen(I64 sockfd, I64 backlog) {
+  CSocket* sock = sockfd(CSocket*);
+  if (sockfd > 0) return sock->listen(sock, backlog);
   else return -1;
 }
 

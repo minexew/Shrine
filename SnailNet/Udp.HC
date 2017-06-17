@@ -65,6 +65,13 @@ I64 UdpParsePacket(U16* source_port_out, U16* dest_port_out, U8** data_out, I64*
   return 0;
 }
 
+I64 UdpSocketAccept(CUdpSocket* s, sockaddr* addr, I64 addrlen) {
+  no_warn s;
+  no_warn addr;
+  no_warn addrlen;
+  return -1;
+}
+
 I64 UdpSocketBind(CUdpSocket* s, sockaddr* addr, I64 addrlen) {
   if (addrlen < sizeof(sockaddr_in))
     return -1;
@@ -97,6 +104,12 @@ I64 UdpSocketConnect(CUdpSocket* s, sockaddr* addr, I64 addrlen) {
   no_warn s;
   no_warn addr;
   no_warn addrlen;
+  return -1;
+}
+
+I64 UdpSocketListen(CUdpSocket* s, I64 backlog) {
+  no_warn s;
+  no_warn backlog;
   return -1;
 }
 
@@ -162,9 +175,11 @@ CUdpSocket* UdpSocket(U16 domain, U16 type) {
     return NULL;
 
   CUdpSocket* s =       MAlloc(sizeof(CUdpSocket));
+  s->sock.accept =      &UdpSocketAccept;
   s->sock.bind =        &UdpSocketBind;
   s->sock.close =       &UdpSocketClose;
   s->sock.connect =     &UdpSocketConnect;
+  s->sock.listen =      &UdpSocketListen;
   s->sock.recvfrom =    &UdpSocketRecvfrom;
   s->sock.sendto =      &UdpSocketSendto;
   s->sock.setsockopt =  &UdpSocketSetsockopt;
