@@ -20,7 +20,7 @@ Software included in Shrine:
 Setting up with networking
 ==========================
 - Native Stack (highly experimental)
-  - configure your VM networking: *Adapter Type: PCnet-PCI II* (`pcnet` in QEMU)
+  - configure your VM networking: *Adapter Type: PCnet-PCI II* (QEMU: `-netdev user,id=u1 -device pcnet,netdev=u1`)
   - *Attached to: NAT* seems to be the most reliable setting, Bridged Mode also works somewhat
   - On boot, Shrine will automatically attempt to acquire an IP address. If you don't get a message about "Configuring network", the adapter was not detected.
 
