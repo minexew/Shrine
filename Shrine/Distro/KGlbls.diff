@@ -4,4 +4,4 @@ index df09c62..977d075 100644
 +++ b/Patched/Kernel/KGlbls.HC
 @@ -16 +16 @@ F64	*pow10_I64,
 -	sys_os_version=5.030;
-+	sys_os_version=5.040;
++	sys_os_version=5.050;
