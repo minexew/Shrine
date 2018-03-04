@@ -82,6 +82,11 @@ class CTcpSocket {
   I64 recv_buf_read_pos;
   I64 recv_buf_write_pos;
 
+  CTcpSocket* backlog_next;
+  CTcpSocket* backlog_first;
+  CTcpSocket* backlog_last;
+  I64 backlog_remaining;
+
   CTcpSendBufHeader* send_buf_first;
   CTcpSendBufHeader* send_buf_last;
 
@@ -308,7 +313,7 @@ static U0 TcpSocketAckSendBufs(CTcpSocket* s, U32 seg_ack) {
     I64 seg_ack_rel = (seg_ack - sb->seq_end) & 0xffffffff;
     I64 snd_nxt_rel = (s->snd_nxt - sb->seq_end) & 0xffffffff;
 
-    if (seg_ack_rel < snd_nxt_rel) {
+    if (seg_ack_rel <= snd_nxt_rel) {
       // Update smoothed RTT
       F64 rtt = time - sb->time_sent;
       s->srtt = (s->srtt * TCP_SRTT_ALPHA) + ((1.0 - TCP_SRTT_ALPHA) * rtt);
@@ -369,23 +374,83 @@ static U0 TcpSocketCheckSendBufs(CTcpSocket* s) {
 }
 
 I64 TcpSocketAccept(CTcpSocket* s, sockaddr* addr, I64 addrlen) {
-  no_warn s;
-  no_warn addr;
+  if (s->state != TCP_STATE_LISTEN)
+    return -1;
+
+  while (1) {
+    // TODO: Thread safe?
+    if (s->backlog_first) {
+      CTcpSocket* new_socket = s->backlog_first;
+      "Retr %p\n", new_socket;
+
+      s->backlog_first = s->backlog_first->backlog_next;
+      if (!s->backlog_first)
+        s->backlog_last = NULL;
+
+      s->backlog_remaining++;
+
+      // TODO: this should be done in a way that doesn't block on accept()
+      I64 maxtime = cnts.jiffies + TCP_CONNECT_TIMEOUT * JIFFY_FREQ / 1000;
+
+      while (cnts.jiffies < maxtime) {
+        if (new_socket->state == TCP_STATE_ESTABLISHED || new_socket->state == TCP_STATE_CLOSED)
+          break;
+        else
+          Yield;
+      }
+
+      if (new_socket->state != TCP_STATE_ESTABLISHED) {
+        close(new_socket);
+        return -1;
+      }
+
+      return new_socket;
+    }
+    else
+      Yield;
+  }
+
+  no_warn addr;   // FIXME
   no_warn addrlen;
   return -1;
 }
 
 I64 TcpSocketBind(CTcpSocket* s, sockaddr* addr, I64 addrlen) {
-  // FIXME: implement
-  no_warn s;
-  no_warn addr;
-  no_warn addrlen;
-  return -1;
+  if (addrlen < sizeof(sockaddr_in))
+    return -1;
+
+  if (s->state != TCP_STATE_CLOSED)
+    return -1;
+
+  sockaddr_in* addr_in = addr;
+
+  U16 local_port = ntohs(addr_in->sin_port);
+
+  // TODO: address & stuff
+  if (tcp_bound_sockets[local_port] != NULL)
+    return -1;
+
+  tcp_bound_sockets[local_port] = s;
+
+  s->local_addr = IPv4GetAddress();
+  s->local_port = local_port;
+
+  return 0;
 }
 
 I64 TcpSocketClose(CTcpSocket* s) {
   if (TcpIsSynchronizedState(s->state)) {
     TcpSend2(s, TCP_FLAG_RST);
+  }
+
+  // Free backlog
+  CTcpSocket* backlog = s->backlog_first;
+  CTcpSocket* backlog2;
+
+  while (backlog) {
+    backlog2 = backlog->backlog_next;
+    close(backlog);
+    backlog = backlog2;
   }
 
   if (s->local_port)
@@ -449,14 +514,20 @@ I64 TcpSocketConnect(CTcpSocket* s, sockaddr* addr, I64 addrlen) {
 }
 
 I64 TcpSocketListen(CTcpSocket* s, I64 backlog) {
-  no_warn s;
-  no_warn backlog;
-  return -1;
+  if (s->state != TCP_STATE_CLOSED)
+    return -1;
+
+  // Enter listen state. If a SYN packet arrives, it will be processed by TcpHandler,
+  // which opens the connection and puts the new socket into the listening socket's accept backlog.
+  s->state = TCP_STATE_LISTEN;
+  s->backlog_remaining = backlog;
+
+  return 0;
 }
 
 I64 TcpSocketRecvfrom(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr* src_addr, I64 addrlen) {
   no_warn flags;
-  no_warn src_addr;
+  no_warn src_addr;   // FIXME
   no_warn addrlen;
   //"TcpSocketRecvfrom\n";
   while (s->state == TCP_STATE_ESTABLISHED && s->recv_buf_read_pos == s->recv_buf_write_pos) {
@@ -590,6 +661,11 @@ CTcpSocket* TcpSocket(U16 domain, U16 type) {
   s->recv_buf_read_pos = 0;
   s->recv_buf_write_pos = 0;
 
+  s->backlog_next = NULL;
+  s->backlog_first = NULL;
+  s->backlog_last = NULL;
+  s->backlog_remaining = 0;
+
   /*s->rcvtimeo_ms = 0;
   s->recv_maxtime = 0;
 
@@ -601,15 +677,62 @@ CTcpSocket* TcpSocket(U16 domain, U16 type) {
 }
 
 U0 TcpSocketHandle(CTcpSocket* s, CIPv4Packet* packet, CTcpHeader* hdr, U8* data, I64 length) {
-  if (s->state == TCP_STATE_CLOSED)
-    return;
-
   U32 seg_len = length;
 
   if (hdr->flags & TCP_FLAG_FIN) seg_len++;
   if (hdr->flags & TCP_FLAG_SYN) seg_len++;
 
   U32 seg_seq = ntohl(hdr->seq);
+
+  if (s->state == TCP_STATE_LISTEN) {
+    // A new connection is being opened.
+
+    if ((hdr->flags & TCP_FLAG_SYN) && s->backlog_remaining > 0) {
+      //"SYN in from %08X:%d => %08X:%d.\n", packet->source_ip, ntohs(hdr->source_port),
+      //    packet->dest_ip, ntohs(hdr->dest_port);
+      CTcpSocket* new_socket = TcpSocket(AF_INET, SOCK_STREAM);
+
+      new_socket->local_addr = IPv4GetAddress();
+      new_socket->local_port = s->local_port;
+      new_socket->remote_addr = packet->source_ip;
+      new_socket->remote_port = ntohs(hdr->source_port);
+
+      new_socket->snd_una = 0;
+      new_socket->snd_nxt = 0;
+      new_socket->snd_wnd = 0;
+      new_socket->mss = TCP_DEFAULT_MSS;
+
+      new_socket->rcv_nxt = ++seg_seq;
+      new_socket->rcv_wnd= TCP_WINDOW_SIZE;
+
+      new_socket->conntime = tS;
+
+      TcpSend2(new_socket, TCP_FLAG_SYN | TCP_FLAG_ACK);
+      new_socket->state = TCP_STATE_SYN_RECEIVED;
+
+      // FIXME FIXME FIXME FIXME
+      tcp_bound_sockets[new_socket->local_port] = new_socket;
+
+      if (s->backlog_last)
+        s->backlog_last->backlog_next = new_socket;
+      else
+        s->backlog_first = new_socket;
+
+      s->backlog_last = new_socket;
+      s->backlog_remaining--;
+    }
+    else {
+      //"REJ %08X:%d (as %08X:%d)\n", packet->source_ip, ntohs(hdr->source_port),
+      //    packet->dest_ip, ntohs(hdr->dest_port);
+      TcpSend(packet->dest_ip, ntohs(hdr->dest_port), packet->source_ip, ntohs(hdr->source_port),
+          seg_seq + 1, seg_seq + 1, TCP_FLAG_ACK | TCP_FLAG_RST);
+    }
+
+    return;
+  }
+
+  if (s->state == TCP_STATE_CLOSED)
+    return;
 
   Bool must_ack = FALSE;
 
@@ -666,6 +789,12 @@ U0 TcpSocketHandle(CTcpSocket* s, CIPv4Packet* packet, CTcpHeader* hdr, U8* data
         s->srtt = tS - s->conntime;
         //"Initial RTT: %f ms", s->srtt * 1000;
       }
+      else if (s->state == TCP_STATE_SYN_RECEIVED) {
+        //"Connection established.\n";
+        s->state = TCP_STATE_ESTABLISHED;
+        s->srtt = tS - s->conntime;
+        //"Initial RTT: %f ms", s->srtt * 1000;
+      }
     }
     else {
       // Unacceptable ACK
@@ -674,8 +803,8 @@ U0 TcpSocketHandle(CTcpSocket* s, CIPv4Packet* packet, CTcpHeader* hdr, U8* data
       if (s->state == TCP_STATE_LISTEN || s->state == TCP_STATE_SYN_SENT
           || s->state == TCP_STATE_SYN_RECEIVED) {
         // Reset
-        TcpSend(s->local_addr, s->local_port, packet->source_ip, hdr->source_port,
-            seg_ack, seg_seq + seg_len, TCP_FLAG_RST);
+        TcpSend(packet->dest_ip, ntohs(hdr->dest_port), packet->source_ip, ntohs(hdr->source_port),
+            seg_ack, seg_seq + seg_len, TCP_FLAG_ACK | TCP_FLAG_RST);
       }
       else if (TcpIsSynchronizedState(s->state)) {
         // Send a 'corrective' ACK

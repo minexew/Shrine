@@ -231,6 +231,11 @@ I64 IPv4Handler(CEthFrame* eth_frame) {
   if (error < 0)
     return error;
 
+  // This seems necessary to receive connections under VBox NAT,
+  // but is also pretty slow, so should be optimized to use a better
+  // struct than linked list.
+  ArpCachePut(packet.source_ip, eth_frame->source_addr);
+
   CL4Protocol* l4 = l4_protocols;
 
   while (l4) {
