@@ -2,3 +2,6 @@ AutoOSInstall/AutoOSInstall.HC
 PkgBin
 *.ISO
 *.iso
+*.img
+patch_applied
+
