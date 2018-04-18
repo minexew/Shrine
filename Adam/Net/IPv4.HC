@@ -86,6 +86,11 @@ static I64 GetEthernetAddressForIP(U32 ip, U8** mac_out) {
   }
   // outside this subnet; needs routing
   else if ((ip & ipv4_subnet_mask) != (my_ip & ipv4_subnet_mask)) {
+    // no gateway
+    if (ipv4_router_addr == 0) {
+      return IPV4_EADDR_INVALID;
+    }
+
     // FIXME: infinite loop if mis-configured
 
     return GetEthernetAddressForIP(ipv4_router_addr, mac_out);
