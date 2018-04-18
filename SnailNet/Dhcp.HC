@@ -242,7 +242,7 @@ I64 DhcpParseOffer(U32 xid, U8* data, I64 length, U32* yiaddr_out,
 
   //"DhcpParseOffer: end %d %d %d %d\n", have_type, have_dns, have_subnet, have_router;
 
-  if (have_type && have_dns && have_subnet && have_router) {
+  if (have_type && have_subnet) {
     *yiaddr_out = ntohl(hdr->yiaddr);
     return 0;
   }
