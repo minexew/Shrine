@@ -19,7 +19,7 @@ from time import time
 from time import localtime
 from time import strftime
 
-from fuse import FUSE, FuseOSError, Operations, LoggingMixIn
+from fuse import FUSE, Operations, LoggingMixIn
 
 if not hasattr(__builtins__, 'bytes'):
     bytes = str
@@ -385,7 +385,7 @@ class RedSea(LoggingMixIn, Operations):
 
     def getattr(self, path, fh=None):
         if path not in self.files:
-            raise FuseOSError(ENOENT)
+            raise Exception('FuseOSError!')
         return self.files[path]
 
     def getxattr(self, path, name, position=0):
