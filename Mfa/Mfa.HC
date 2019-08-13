@@ -35,7 +35,7 @@ U0 ReadBlk(U8* buf, I64 count) {
 U0 Mfa() {
   U8 command;
 
-  comm = CommInit8n1(MFA_COM, 115200);
+  comm = CommInit8n1(MFA_COM, 9600);
   while (FifoU8Rem(comm->RX_fifo, &command)) {}
 
   "$FG,5$minimalist file access\n"
