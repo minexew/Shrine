@@ -17,6 +17,8 @@ cd Shrine && ./apply-patches.sh && cd ..
 # Finally run the machinery
 qemu-img create -f qcow2 ~/shrine.img 2G
 mkdir PkgBin
+Install fuse libraries for your OS
+Add Shrine/redseafs and Shrine/redseafs/fuse to your PYTHONPATH
 ./make-dist.py TOS_Distro.ISO Shrine ~/shrine.img
 ```
 
