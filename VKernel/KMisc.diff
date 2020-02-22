@@ -1,0 +1,38 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/KMisc.HC b/Patched/Kernel/KMisc.HC
+index 25fee0f..17242b2 100644
+--- a/../TempleOS/TempleOSCD/Kernel/KMisc.HC
++++ b/Patched/Kernel/KMisc.HC
+@@ -60,6 +60,8 @@ U0 IntCore0TimerHndlr(CTask *)
+ 
+ I64 SysTimerRead()
+ {//System timer count with overflow already handled.
++  return 0;   // FIXME
++  /*
+   I64 i,res;
+   PUSHFD
+   CLI
+@@ -75,6 +77,7 @@ I64 SysTimerRead()
+   LBtr(&sys_semas[SEMA_SYS_TIMER],0);
+   POPFD
+   return res;
++  */
+ }
+ 
+ I64 HPET()
+@@ -135,6 +138,8 @@ Bool Blink(F64 Hz=2.5)
+ 
+ U0 Busy(I64 ÊS)
+ {//Loosely timed.
++  VSysCall(VSYSCALL_USLEEP, ÊS, 0, 0);
++  /*
+   I64 i;
+   if (cnts.HPET_freq) {
+     i=HPET+cnts.HPET_freq*ÊS/1000000;
+@@ -142,6 +147,7 @@ U0 Busy(I64 
+   } else
+     for (i=0;i<ÊS;i++)
+       PortNop;
++  */
+ }
+ 
+ U0 SleepUntil(I64 wake_jiffy)

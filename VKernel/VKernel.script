@@ -1,0 +1,16 @@
+# enter c enter p 1 enter enter enter enter
+
+put	/Kernel/Display.HC.Z	Patched/Kernel/Display.HC
+put	/Kernel/KDate.HC.Z	Patched/Kernel/KDate.HC
+put	/Kernel/KMisc.HC.Z	Patched/Kernel/KMisc.HC
+put	/Kernel/KUtils.HC.Z	Patched/Kernel/KUtils.HC
+put	/Kernel/Mem/BlkPool.HC.Z	Patched/Kernel/Mem/BlkPool.HC
+put	/Kernel/Mem/MemPhysical.HC.Z	Patched/Kernel/Mem/MemPhysical.HC
+put	/Kernel/VKMain.HC.Z	VKMain.HC
+put	/Kernel/VKStart64.HC.Z	VKStart64.HC
+put	/Kernel/VKernel.HH.Z	VKernel.HH
+put	/Kernel/VKernel.PRJ.Z	VKernel.PRJ
+put	/Kernel/VSysCall.HC.Z	VSysCall.HC
+
+command	Cmp("/Kernel/VKernel",,"/Kernel/VKernel.BIN.C",':');
+list	/Kernel/VKernel.BIN.C	VKernel.BIN

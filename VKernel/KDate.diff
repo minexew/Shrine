@@ -1,0 +1,21 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/KDate.HC b/Patched/Kernel/KDate.HC
+index b56ee58..72d0113 100644
+--- a/../TempleOS/TempleOSCD/Kernel/KDate.HC
++++ b/Patched/Kernel/KDate.HC
+@@ -137,6 +137,8 @@ U0 NowDateTimeStruct(CDateStruct *_ds)
+   Bool is_bcd;
+ 
+   MemSet(_ds,0,sizeof(CDateStruct));
++  // FIXME
++  /*
+   PUSHFD
+   CLI
+   while (LBts(&sys_semas[SEMA_SYS_DATE],0))
+@@ -186,6 +188,7 @@ U0 NowDateTimeStruct(CDateStruct *_ds)
+   if (_ds->hour>23)	_ds->hour=23;
+   if (_ds->min>59)	_ds->min=59;
+   if (_ds->sec>59)	_ds->sec=59;
++  */
+ }
+ 
+ CDate Now()

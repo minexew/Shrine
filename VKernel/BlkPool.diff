@@ -1,0 +1,53 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/Mem/BlkPool.HC b/Patched/Kernel/Mem/BlkPool.HC
+index 0d73bcb..fdd62c5 100644
+--- a/../TempleOS/TempleOSCD/Kernel/Mem/BlkPool.HC
++++ b/Patched/Kernel/Mem/BlkPool.HC
+@@ -3,7 +3,7 @@ U0 BlkPoolAdd(CBlkPool *bp,CMemBlk *m,I64 pags)
+   if (sys_mem_init_flag)
+     MemSet(m,sys_mem_init_val,pags*MEM_PAG_SIZE);
+   PUSHFD
+-  CLI
++  //CLI
+   while (LBts(&bp->locked_flags,BPlf_LOCKED))
+     PAUSE
+   m->next=bp->mem_free_lst;
+@@ -28,9 +28,9 @@ U0 BlkPoolInit(CBlkPool *bp,I64 pags)
+ 
+ U0 BlkPoolsInit()
+ {
+-  I64 i,total,lo,hi,code_heap_limit;
+-  CMemE820 *m20=MEM_E820;
+-  Bool first=TRUE;
++  I64 i,total,/*lo,hi,*/code_heap_limit;
++  /*CMemE820 *m20=MEM_E820;
++  Bool first=TRUE;*/
+ 
+   total=BIOSTotalMem;
+ 
+@@ -44,12 +44,10 @@ U0 BlkPoolsInit()
+   i=code_heap_limit-SYS_16MEG_AREA_LIMIT; //See $LK,"RLf_16MEG_SYS_CODE_BP",A="FF:::/Kernel/Mem/PageTables.HC,RLf_16MEG_SYS_CODE_BP"$
+   BlkPoolAdd(sys_code_bp,SYS_16MEG_AREA_LIMIT,i>>MEM_PAG_BITS);
+   mem_heap_limit=i+SYS_16MEG_AREA_LIMIT-1;
+-
++/*
+   if (code_heap_limit<total) {
+-    while (m20->type) {
+-      if (m20->type==1) {
+-	lo=m20->base;
+-	hi=m20->base+m20->len;
++	lo=0x2000000;    // TODO: fetch via syscall
++	hi=0x4000000;
+ 	if (lo<code_heap_limit) {
+ 	  if (hi>code_heap_limit)
+ 	    lo=code_heap_limit;
+@@ -65,9 +63,6 @@ U0 BlkPoolsInit()
+ 	  } else
+ 	    BlkPoolAdd(sys_data_bp,lo,(hi-lo)>>MEM_PAG_BITS);
+ 	}
+-      }
+-      m20++;
+-    }
+-  }
++  }*/
+   LBts(&sys_run_level,RLf_FULL_HEAPS);
+ }

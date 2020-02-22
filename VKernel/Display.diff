@@ -1,0 +1,89 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/Display.HC b/Patched/Kernel/Display.HC
+index 06abfc2..6e1d83f 100644
+--- a/../TempleOS/TempleOSCD/Kernel/Display.HC
++++ b/Patched/Kernel/Display.HC
+@@ -6,83 +6,7 @@ the normal scrn text output routine.
+ 
+ See also $LK,"GrUpdateScrn",A="MN:GrUpdateScrn"$().
+ */
+-  I64 i,row,col;
+-  U8 *ptr,*ptr1,*ptr2;
+-
+-  if (!(text.raw_flags&RWF_SHOW_DOLLAR)) {
+-    if (ch=='$$') {
+-      if (text.raw_flags&RWF_IN_DOLLAR) {
+-	text.raw_flags&=~RWF_IN_DOLLAR;
+-	if (!(text.raw_flags & RWF_LAST_DOLLAR)) {
+-	  text.raw_flags&=~RWF_LAST_DOLLAR;
+-	  return;
+-	}
+-      } else {
+-	text.raw_flags|=RWF_IN_DOLLAR|RWF_LAST_DOLLAR;
+-	return;
+-      }
+-    }
+-    text.raw_flags&=~RWF_LAST_DOLLAR;
+-    if (text.raw_flags&RWF_IN_DOLLAR)
+-      return;
+-  }
+-  if (ch=='\t') {
+-    RawPutChar(CH_SPACE);
+-    while (text.raw_col & 7)
+-      RawPutChar(CH_SPACE);
+-  } else if (ch==CH_BACKSPACE) {
+-    text.raw_col--;
+-    RawPutChar(CH_SPACE);
+-    text.raw_col--;
+-  } else if (ch=='\n') {
+-    RawPutChar(CH_SPACE);
+-    while (text.raw_col % text.cols)
+-      RawPutChar(CH_SPACE);
+-
+-  } else if (Bt(char_bmp_displayable,ch)) {
+-    row=text.raw_col/text.cols%text.rows;
+-    col=text.raw_col%text.cols;
+-    if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
+-      if (text.raw_flags&RWF_SCROLL && text.raw_col && !row && !col) {
+-	MemCpy(text.vga_text_alias,text.vga_text_alias+text.cols*2,
+-	      text.cols*(text.rows-1)*2);
+-	MemSet(text.vga_text_alias+text.cols*(text.rows-1)*2,0,text.cols*2);
+-	text.raw_col-=text.cols;
+-	row=text.rows-1;
+-      }
+-      ptr=text.vga_text_alias+(row*text.cols+col)*2;
+-      ptr[0]=ch;
+-      ptr[1]=BLACK<<4+WHITE;
+-    } else {
+-      OutU8(VGAP_IDX,VGAR_MAP_MASK);
+-      OutU8(VGAP_DATA,0x0F); //All planes -- WHITE
+-      if (text.raw_flags&RWF_SCROLL && text.raw_col && !row && !col) {
+-//Scroll cached image
+-	MemCpy(text.raw_scrn_image,
+-	      text.raw_scrn_image+GR_WIDTH*FONT_HEIGHT>>3,
+-	      GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3);
+-	MemSet(text.raw_scrn_image+GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3,0,
+-	      GR_WIDTH*FONT_HEIGHT>>3);
+-
+-	MemCpy(text.vga_alias,text.raw_scrn_image,GR_WIDTH*GR_HEIGHT>>3);
+-	text.raw_col-=text.cols;
+-	row=text.rows-1;
+-      }
+-      PUSHFD
+-      CLI
+-      ptr=ptr1=col+row*GR_WIDTH*FONT_HEIGHT>>3;
+-      ptr+=text.vga_alias;
+-      ptr1+=text.raw_scrn_image; //Write to cached image as well
+-      ptr2=&text.font[ch&255];
+-      for (i=0;i<FONT_HEIGHT;i++) {
+-	*ptr=*ptr1=rev_bits_table[*ptr2++];
+-	ptr+=GR_WIDTH>>3;
+-	ptr1+=GR_WIDTH>>3;
+-      }
+-      POPFD
+-    }
+-    text.raw_col++;
+-  }
++  VSysCall(VSYSCALL_PUTCHAR, ch, 0, 0);
+ }
+ 
+ U0 VGAFlush()
