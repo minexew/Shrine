@@ -1,0 +1,14 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/BlkDev/DskStrB.HC b/Patched/Kernel/BlkDev/DskStrB.HC
+index 3df7e01..bc9ea1a 100644
+--- a/../TempleOS/TempleOSCD/Kernel/BlkDev/DskStrB.HC
++++ b/Patched/Kernel/BlkDev/DskStrB.HC
+@@ -27,6 +27,9 @@ I64 Name2DirClus(CDrv *dv,U8 *dirname)
+ 	  case FSt_FAT32:
+ 	    cont=FAT32FileFind(dv,cur_dir_clus,buf2,&de,FUF_JUST_DIRS);
+ 	    break;
++	  case FSt_HOSTFS:
++	    cont=HostFsFileFind(dv,cur_dir_clus,buf2,&de,FUF_JUST_DIRS);
++	    break;
+ 	  default:
+ 	    throw('Drv');
+ 	}

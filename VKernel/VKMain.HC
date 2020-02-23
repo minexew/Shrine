@@ -153,14 +153,15 @@ U0 VKMain()
   sys_boot_src = BOOT_SRC_HARDDRV;
   sys_boot_blk = 0;     // unused for HDD boot AFAIK
 
-  // Probably kernel load address
-  // But in virtualbox it's 0x7c3c (for SYS_KERNEL == 0x7c20)
-  mem_boot_base = 0x107c3c;
-  sys_boot_patch_table_base = 0x107c2c;
+  mem_boot_base = 0x107c20;
+  CBinFile *bfh=mem_boot_base-sizeof(CBinFile);
+  sys_boot_patch_table_base = mem_boot_base-sizeof(CBinFile)+bfh->patch_table_offset;
 
   // KStart32
 
   sys_code_bp = &(SYS_FIXED_AREA(CSysFixedArea*))->sys_code_bp;
+
+  LBts(&sys_run_level,RLf_PATCHED); // TODO explain
 
   // FIXME: is this ok? won't it be overwritten by something?
   mem_heap_base = 0x1000000;
@@ -168,7 +169,8 @@ U0 VKMain()
   VKStart64();
 }
 
-U0 VKMain2() {
+U0 VKMain2()
+{
   CBlkDev *bd;
   //OutU8(0x61,InU8(0x61)&~3); //Snd;
   adam_task=Fs;
@@ -186,7 +188,7 @@ U0 VKMain2() {
   TaskDerivedValsUpdate;
 
   SysDefinesLoad;
-  //Core0Init;
+  Core0Init;
   //IntInit1;
 
   //Before this point use $LK,"Snd",A="MN:Snd"$() and $LK,"Busy",A="MN:Busy"$()
@@ -196,8 +198,8 @@ U0 VKMain2() {
 	sys_os_version,sys_compile_time,sys_compile_time;
 
   //TimersInit;
-  if (BIOSTotalMem<ToI64(0.95*MEM_MIN_MEG*0x100000))
-    RawPrint(4000,"!!! Requires $TX,"512Meg",D="DD_MEM_MIN_MEG"$ of RAM Memory !!!");
+  //if (BIOSTotalMem<ToI64(0.95*MEM_MIN_MEG*0x100000))
+  //  RawPrint(4000,"!!! Requires $TX,"512Meg",D="DD_MEM_MIN_MEG"$ of RAM Memory !!!");
 
   // IntsInit;
   // "Enable IRQ's\n";
@@ -207,7 +209,7 @@ U0 VKMain2() {
   LBts(&sys_run_level,RLf_INTERRUPTS);
 
   TimeCal;
-  BlkDevsInitAll;
+  BlkDevsInitHostFS;
   "DskChg(':');\n";
   DskChg(':');
   #exe {
@@ -229,33 +231,35 @@ U0 VKMain2() {
   LBts(&sys_run_level,RLf_BLKDEV);
 
   #exe {
+    /*
     if (!kernel_cfg->opts[CFG_NO_MP])
       StreamPrint("\"MultiCore Start\\n\\n\";"
 	    "Core0StartMP;"
 	    "LBts(&sys_run_level,RLf_MP);");
+    */
   };
 
   KbdMsInit;
   MsInit;
-  KbdInit;
+  //KbdInit;
   Spawn(&MsHardDrvrInstall);
 
   "Loading Compiler\n";
   Cd("/Compiler");
-  Load("Compiler",LDF_SILENT);
+  Load("Compiler",0);//LDF_SILENT);
   LBts(&sys_run_level,RLf_COMPILER);
 
   DbgMode(OFF);
   cnts.time_stamp_freq_initial=TimeCal;
   Cd("/");
-  try ExeFile("StartOS"); //Continues $LK,"/StartOS.HC",A="FL:/StartOS.HC,1"$
-  catch {
+  /*try*/ ExeFile("StartOS"); //Continues $LK,"/StartOS.HC",A="FL:/StartOS.HC,1"$
+  /*catch {
     Raw(ON);
     Silent(OFF);
     GetOutOfDollar;
     PutExcept;
     Dbg;
-  }
+  }*/
 
   LBts(&sys_run_level,RLf_ADAM_SERVER);
   SrvTaskCont; //Never to return

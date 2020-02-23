@@ -1,16 +1,29 @@
 # enter c enter p 1 enter enter enter enter
 
+put	/Kernel/BlkDev/DskAddDev.HC.Z	Patched/Kernel/BlkDev/DskAddDev.HC
+put	/Kernel/BlkDev/DskDrv.HC.Z	Patched/Kernel/BlkDev/DskDrv.HC
+put	/Kernel/BlkDev/DskFile.HC.Z	Patched/Kernel/BlkDev/DskFile.HC
+put	/Kernel/BlkDev/DskStrB.HC.Z	Patched/Kernel/BlkDev/DskStrB.HC
+put	/Kernel/BlkDev/MakeBlkDev.HC.Z	Patched/Kernel/BlkDev/MakeBlkDev.HC
 put	/Kernel/Display.HC.Z	Patched/Kernel/Display.HC
 put	/Kernel/KDate.HC.Z	Patched/Kernel/KDate.HC
+put	/Kernel/KDbg.HC.Z	Patched/Kernel/KDbg.HC
+put	/Kernel/KDefine.HC.Z	Patched/Kernel/KDefine.HC
 put	/Kernel/KMisc.HC.Z	Patched/Kernel/KMisc.HC
 put	/Kernel/KUtils.HC.Z	Patched/Kernel/KUtils.HC
+put	/Kernel/KernelA.HH.Z	Patched/Kernel/KernelA.HH
 put	/Kernel/Mem/BlkPool.HC.Z	Patched/Kernel/Mem/BlkPool.HC
 put	/Kernel/Mem/MemPhysical.HC.Z	Patched/Kernel/Mem/MemPhysical.HC
+put	/Kernel/MultiProc.HC.Z	Patched/Kernel/MultiProc.HC
+put	/Kernel/Sched.HC.Z	Patched/Kernel/Sched.HC
+
 put	/Kernel/VKMain.HC.Z	VKMain.HC
 put	/Kernel/VKStart64.HC.Z	VKStart64.HC
 put	/Kernel/VKernel.HH.Z	VKernel.HH
 put	/Kernel/VKernel.PRJ.Z	VKernel.PRJ
 put	/Kernel/VSysCall.HC.Z	VSysCall.HC
+put	/Kernel/BlkDev/FileSysHostFS.HC.Z	FileSysHostFS.HC
+put	/Kernel/BlkDev/FileSysHostFSFwd.HC.Z	FileSysHostFSFwd.HC
 
 command	Cmp("/Kernel/VKernel",,"/Kernel/VKernel.BIN.C",':');
 list	/Kernel/VKernel.BIN.C	VKernel.BIN

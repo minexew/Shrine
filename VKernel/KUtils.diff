@@ -1,9 +1,27 @@
 diff --git a/../TempleOS/TempleOSCD/Kernel/KUtils.HC b/Patched/Kernel/KUtils.HC
-index f864990..4fef1c1 100644
+index f864990..219ce87 100644
 --- a/../TempleOS/TempleOSCD/Kernel/KUtils.HC
 +++ b/Patched/Kernel/KUtils.HC
-@@ -442,16 +442,13 @@ SET_GS_BASE::
- 	POP	RAX
+@@ -430,28 +430,22 @@ _CALLEXTSTR::
+ 	POP	RBP
+ 	RET
+ SET_GS_BASE::
++	PUSH RAX
++	PUSH	0
++	PUSH	0
+ 	PUSH	RAX
+-	PUSH	RCX
+-	PUSH	RDX
+-	MOV	RDX,RAX
+-	SHR	RDX,32
+-	MOV	ECX,IA32_GS_BASE
+-	WRMSR
+-	POP	RDX
+-	POP	RCX
+-	POP	RAX
++	PUSH	VSYSCALL_SETGS
++	CALL	_VSYSCALL
++	POP RAX
  	RET
  SET_FS_BASE::
 +	PUSH RAX
@@ -19,7 +37,7 @@ index f864990..4fef1c1 100644
 -	POP	RDX
 -	POP	RCX
 -	POP	RAX
-+	PUSH	2
++	PUSH	VSYSCALL_SETFS
 +	CALL	_VSYSCALL
 +	POP RAX
  _RET::

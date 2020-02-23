@@ -1,0 +1,12 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/Sched.HC b/Patched/Kernel/Sched.HC
+index a86b99a..a2abb5d 100644
+--- a/../TempleOS/TempleOSCD/Kernel/Sched.HC
++++ b/Patched/Kernel/Sched.HC
+@@ -154,6 +154,7 @@ _TASK_END_NOW::
+ 	JMP	I8 RESTORE_RSI_TASK
+ 
+ _YIELD::
++	RET
+ 	PUSHFD
+ 	TEST	U8 [SYS_SEMAS+SEMA_SINGLE_USER*DFT_CACHE_LINE_WIDTH],1
+ 	JZ	@@05

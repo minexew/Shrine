@@ -1,0 +1,18 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/BlkDev/MakeBlkDev.HC b/Patched/Kernel/BlkDev/MakeBlkDev.HC
+index 7748664..aec52ed 100644
+--- a/../TempleOS/TempleOSCD/Kernel/BlkDev/MakeBlkDev.HC
++++ b/Patched/Kernel/BlkDev/MakeBlkDev.HC
+@@ -1,4 +1,5 @@
+ #exe {Cd(__DIR__);};
++#include "FileSysHostFSFwd"
+ #include "DskStrA"
+ #include "DskCache"
+ #include "DskATA"
+@@ -12,6 +13,7 @@
+ #include "DskDirA"
+ #include "FileSysRedSea"
+ #include "FileSysFAT"
++#include "FileSysHostFS"
+ #include "DskDirContext"
+ #include "DskFind"
+ #include "DskDirB"

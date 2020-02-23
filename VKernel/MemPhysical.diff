@@ -1,8 +1,8 @@
 diff --git a/../TempleOS/TempleOSCD/Kernel/Mem/MemPhysical.HC b/Patched/Kernel/Mem/MemPhysical.HC
-index bf895b4..9936f31 100644
+index bf895b4..65a6f6b 100644
 --- a/../TempleOS/TempleOSCD/Kernel/Mem/MemPhysical.HC
 +++ b/Patched/Kernel/Mem/MemPhysical.HC
-@@ -150,20 +150,8 @@ U0 UncachedAliasAlloc() //Make uncached alias for 4 lowest Gig.
+@@ -150,20 +150,7 @@ U0 UncachedAliasAlloc() //Make uncached alias for 4 lowest Gig.
  
  I64 BIOSTotalMem()
  {
@@ -20,8 +20,7 @@ index bf895b4..9936f31 100644
 -    }
 -  }
 -  return MaxI64(r01,r20);
-+  // FIXME: fetch via syscall
-+  return SYS_16MEG_AREA_LIMIT + 0x1000000;
++  return SYS_16MEG_AREA_LIMIT + VSysCall(VSYSCALL_MEMSIZE, 0, 0, 0);
  }
  
  I64 Scale2Mem(I64 min,I64 max,I64 limit=2*1024*1024*1024)

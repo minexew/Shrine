@@ -1,5 +1,5 @@
 diff --git a/../TempleOS/TempleOSCD/Kernel/KMisc.HC b/Patched/Kernel/KMisc.HC
-index 25fee0f..17242b2 100644
+index 25fee0f..7f7f75d 100644
 --- a/../TempleOS/TempleOSCD/Kernel/KMisc.HC
 +++ b/Patched/Kernel/KMisc.HC
 @@ -60,6 +60,8 @@ U0 IntCore0TimerHndlr(CTask *)
@@ -36,3 +36,19 @@ index 25fee0f..17242b2 100644
  }
  
  U0 SleepUntil(I64 wake_jiffy)
+@@ -224,6 +230,7 @@ Bool ScrnCast(Bool val=ON,Bool just_audio=FALSE,U8 *print_fmt="B:/Tmp/%X.GR")
+ 
+ U0 SndRst()
+ {//Fix stuck sound.
++  /*
+   if (Bt(&sys_semas[SEMA_SND],0)) {
+     Sleep(1);
+     if (Bt(&sys_semas[SEMA_SND],0)) {
+@@ -232,6 +239,7 @@ U0 SndRst()
+     }
+   }
+   Snd;
++  */
+ }
+ 
+ U0 Beep(I8 ona=62,Bool busy=FALSE)

@@ -1,0 +1,13 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/MultiProc.HC b/Patched/Kernel/MultiProc.HC
+index 4681a01..6304d3d 100644
+--- a/../TempleOS/TempleOSCD/Kernel/MultiProc.HC
++++ b/Patched/Kernel/MultiProc.HC
+@@ -372,7 +372,7 @@ U0 Core0Init()
+   if (Bt(&ee.rdx,9)) {
+ //Unnecessary?
+     //	  SetMSR(IA32_LAPIC_BASE,dev.uncached_alias+LAPIC_BASE+0x900);
+-    MPAPICInit;
++    //MPAPICInit;
+   }
+ }
+ 

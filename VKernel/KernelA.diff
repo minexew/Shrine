@@ -1,0 +1,26 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/KernelA.HH b/Patched/Kernel/KernelA.HH
+index 7057903..4dea440 100644
+--- a/../TempleOS/TempleOSCD/Kernel/KernelA.HH
++++ b/Patched/Kernel/KernelA.HH
+@@ -2604,7 +2604,8 @@ public class CDirEntry
+ #define BDT_ISO_FILE_READ	3
+ #define BDT_ISO_FILE_WRITE	4
+ #define BDT_ATAPI		5
+-#define BDT_TYPES_NUM		6
++#define BDT_HOSTFS  6
++#define BDT_TYPES_NUM		7
+ 
+ #define BDF_REMOVABLE		0x001
+ #define BDF_INITIALIZED		0x002
+@@ -2660,8 +2661,9 @@ public class CBlkDev
+ #define FSt_FAT32	2 //Supported except for short names, to some degree
+ #define FSt_ISO9660	3 //Not Supported
+ #define FSt_NTFS	4 //Not Supported
+-#define FSt_UNKNOWN	5
+-#define FSt_TYPES_NUM	6
++#define FSt_HOSTFS 5
++#define FSt_UNKNOWN	6
++#define FSt_TYPES_NUM	7
+ #define FSG_TYPE_MASK	0x7FFF
+ //File system type flags
+ #define FStf_DISABLE	15

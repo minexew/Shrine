@@ -52,7 +52,7 @@ MOV RSI, 0x109240
   PUSH  SYS_FIXED_AREA+CSysFixedArea.boot_cpu
   PUSH  0
   CALL  &CPUStructInit
-  //CALL  SET_GS_BASE
+  CALL  SET_GS_BASE
 
 //Init Adam HeapCtrl
   MOV EDI,U32 SYS_FIXED_AREA+CSysFixedArea.adam_hc
@@ -77,5 +77,6 @@ MOV RSI, 0x109240
   CALL  &TaskInit
   CALL  SET_FS_BASE
   MOV RSP,U64 CTask.rsp[RAX]
+
   JMP I32 VKMain2
 }

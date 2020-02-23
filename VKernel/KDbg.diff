@@ -1,0 +1,21 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/KDbg.HC b/Patched/Kernel/KDbg.HC
+index 48708ba..30863aa 100644
+--- a/../TempleOS/TempleOSCD/Kernel/KDbg.HC
++++ b/Patched/Kernel/KDbg.HC
+@@ -15,6 +15,8 @@ Bool ChkPtr(U8 *ptr)
+ 
+ Bool ChkCodePtr(U8 *ptr)
+ {//Check if addr is valid code addr.
++  return mem_heap_base<=ptr<=mem_heap_limit;
++  /*
+   if (mem_heap_base<=ptr<=mem_heap_limit) {
+     if (*MemPageTable(ptr)&1)
+       return TRUE;
+@@ -26,6 +28,7 @@ Bool ChkCodePtr(U8 *ptr)
+     return TRUE;
+   else
+     return FALSE;
++  */
+ }
+ 
+ Bool ChkOnStk(U8 *ptr,CTask *task=NULL)
