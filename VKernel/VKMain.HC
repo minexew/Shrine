@@ -139,7 +139,7 @@ U0 KMain() {}
 // Entry point for the loader
 U0 VKMain()
 {
-  RawPutChar(':'); RawPutChar('^'); RawPutChar(')'); RawPutChar('\n');
+  //RawPutChar(':'); RawPutChar('^'); RawPutChar(')'); RawPutChar('\n');
 
   // KStart16
 
@@ -246,7 +246,7 @@ U0 VKMain2()
 
   "Loading Compiler\n";
   Cd("/Compiler");
-  Load("Compiler",0);//LDF_SILENT);
+  Load("Compiler",LDF_SILENT);
   LBts(&sys_run_level,RLf_COMPILER);
 
   DbgMode(OFF);
