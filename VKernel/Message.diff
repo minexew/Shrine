@@ -1,0 +1,27 @@
+diff --git a/../TempleOS/TempleOSCD/Kernel/SerialDev/Message.HC b/Patched/Kernel/SerialDev/Message.HC
+index e94f246..978557f 100644
+--- a/../TempleOS/TempleOSCD/Kernel/SerialDev/Message.HC
++++ b/Patched/Kernel/SerialDev/Message.HC
+@@ -143,6 +143,14 @@ I64 GetKey(I64 *_scan_code=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE)
+ {//Waits for $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$ message and returns $LK,"ASCII",A="MN:CH_CTRLA"$.
+ //Sets $LK,"scan_code",A="FI:::/Doc/CharOverview.DD"$.
+   //$LK,"ScanKey",A="MN:ScanKey"$() throws away other message types.
++  U8 ch;
++  if (VSysCall(VSYSCALL_READ, 0, &ch, 1)) {
++    return ch;
++  }
++  else {
++    return 0;
++  }
++  /*
+   I64 ch,sc;
+   Bool cursor_on=FALSE;
+   while (!ScanKey(&ch,&sc,FALSE)) {
+@@ -177,6 +185,7 @@ I64 GetKey(I64 *_scan_code=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE)
+     PutKey(ch,sc);
+   if (_scan_code) *_scan_code=sc;
+   return ch;
++  */
+ }
+ 
+ I64 GetChar(I64 *_scan_code=NULL,Bool echo=TRUE,Bool raw_cursor=FALSE)

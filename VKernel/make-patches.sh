@@ -21,3 +21,4 @@ git diff $FLAGS "$PURE_DIR/Kernel/Mem/BlkPool.HC" "$PATCHED_DIR/Kernel/Mem/BlkPo
 git diff $FLAGS "$PURE_DIR/Kernel/Mem/MemPhysical.HC" "$PATCHED_DIR/Kernel/Mem/MemPhysical.HC" >MemPhysical.diff
 git diff $FLAGS "$PURE_DIR/Kernel/MultiProc.HC" "$PATCHED_DIR/Kernel/MultiProc.HC" >MultiProc.diff
 git diff $FLAGS "$PURE_DIR/Kernel/Sched.HC" "$PATCHED_DIR/Kernel/Sched.HC" >Sched.diff
+git diff $FLAGS "$PURE_DIR/Kernel/SerialDev/Message.HC" "$PATCHED_DIR/Kernel/SerialDev/Message.HC" >Message.diff

@@ -22,5 +22,6 @@ patch $FLAGS -i KUtils.diff
 patch $FLAGS -i KernelA.diff
 patch $FLAGS -i MakeBlkDev.diff
 patch $FLAGS -i MemPhysical.diff
+patch $FLAGS -i Message.diff
 patch $FLAGS -i MultiProc.diff
 patch $FLAGS -i Sched.diff

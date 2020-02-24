@@ -16,6 +16,7 @@ put	/Kernel/Mem/BlkPool.HC.Z	Patched/Kernel/Mem/BlkPool.HC
 put	/Kernel/Mem/MemPhysical.HC.Z	Patched/Kernel/Mem/MemPhysical.HC
 put	/Kernel/MultiProc.HC.Z	Patched/Kernel/MultiProc.HC
 put	/Kernel/Sched.HC.Z	Patched/Kernel/Sched.HC
+put	/Kernel/SerialDev/Message.HC.Z	Patched/Kernel/SerialDev/Message.HC
 
 put	/Kernel/VKMain.HC.Z	VKMain.HC
 put	/Kernel/VKStart64.HC.Z	VKStart64.HC
