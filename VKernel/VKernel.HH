@@ -6,6 +6,7 @@
 #define VSYSCALL_STAT       6
 #define VSYSCALL_STATCLUS   7
 #define VSYSCALL_FREAD      8
+#define VSYSCALL_READ       9
 
 // neutralize CLI instructions
 #define CLI
