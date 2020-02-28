@@ -31,7 +31,7 @@ U0 MakeMyISO(U8 *_out_iso_filename)
   CopyTree("/Misc",	"/Distro/Misc");
 
   //To save space, optionally delete dictionary.
-  //Del("/Distro/Adam/AutoComplete/ACDefs.DATA");
+  Del("/Distro/Adam/AutoComplete/ACDefs.DATA");
   CopyTree("/Downloads","/Distro/Downloads");	  //You can leave this out.
   DirMk("/Distro/Tmp");
   DirMk("/Distro/Tmp/ScrnShots");
@@ -44,6 +44,6 @@ U0 MakeMyISO(U8 *_out_iso_filename)
   Free(out_iso_filename);
 }
 
-MakeMyISO("/Tmp/MyDistro.ISO.C");
+MakeMyISO("/Tmp/ShrineDist.ISO.C");
 
 // Study my account examples $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOS/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOS/TOSDistro.HC,1"$.

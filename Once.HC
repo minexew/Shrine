@@ -1,3 +1,7 @@
+#include "::/Apps/Lsh";
+#include "::/Apps/Pkg";
+#include "::/Misc/PalUbuntu.HC"
+
 //Place this file in /Home and change
 //anything you want.
 
@@ -52,4 +56,6 @@ U0 Tmp()
   }
 }
 
+#exe { if (SNAILNET_NATIVE_DRIVER != NULL) StreamPrint("Netcfg;\n"); }
 Tmp;
+Lsh;

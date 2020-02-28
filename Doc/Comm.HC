@@ -100,6 +100,7 @@ public CComm *CommInit8n1(I64 port,I64 baud)
   return c;
 }
 
+/*
 public U0 CommPutChar(I64 port,U8 b)
 {
   CComm *c=&comm_ports[port];
@@ -109,6 +110,17 @@ public U0 CommPutChar(I64 port,U8 b)
   OutU8(c->base+UART_IER,3);	//RX and THR empty
   POPFD
   Sleep(10); //!!! Remove this line!!!	Linux echo_socket is too slow.
+}
+*/
+
+public U0 CommPutChar(I64 port,U8 b)
+{
+  I64 base=comm_ports[port].base;
+  while (!(InU8(base+UART_LSR) & 0x20))
+    Yield;
+  OutU8(base+UART_THR,b);
+  while (!(InU8(base+UART_LSR) & 0x20))
+    Yield;
 }
 
 U0 CommPutS(I64 port,U8 *st)
