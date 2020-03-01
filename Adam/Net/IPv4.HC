@@ -17,6 +17,7 @@ class CIPv4Packet {
 
   U8* data;
   I64 length;
+  I64 ttl;
 };
 
 class CIPv4Header {
@@ -212,6 +213,7 @@ I64 IPv4ParsePacket(CIPv4Packet* packet_out, CEthFrame* eth_frame) {
 
   packet_out->data = eth_frame->data + header_length;
   packet_out->length = total_length - header_length;
+  packet_out->ttl = hdr->ttl;
 
   return 0;
 }

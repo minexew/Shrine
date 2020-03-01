@@ -90,6 +90,7 @@ I64 ArpHandler(CEthFrame* eth_frame) {
   if (eth_frame->ethertype != ETHERTYPE_ARP)
     return -1;
 
+  // FIXME[obecebo]: this blocks responding to ARP_REQUEST? [2019/08/05]
   if (eth_frame->length < sizeof(CArpHeader))
     return -1;
 
