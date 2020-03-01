@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 // Not a Network Layer protocol, but it is encapsulated in L2 frames, which makes it L3 for our purposes
 
 #define ARP_REQUEST         0x01

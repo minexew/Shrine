@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 #include "::/Adam/Net/Dhcp"
 
 #define CLIENT_START            0

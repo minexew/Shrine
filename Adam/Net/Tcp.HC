@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 // https://tools.ietf.org/html/rfc793
 
 // See https://en.wikipedia.org/wiki/File:Tcp_state_diagram_fixed_new.svg

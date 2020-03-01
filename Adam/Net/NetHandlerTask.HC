@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 U0 HandleNetFifoEntry(CNetFifoEntry* e) {
   CEthFrame l2_frame;
 

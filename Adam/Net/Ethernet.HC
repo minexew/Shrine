@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 class CEthFrame {
   U8  source_addr[6];
   U8  padding[2];

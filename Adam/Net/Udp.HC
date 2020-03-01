@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 class CUdpHeader {
   U16 source_port;
   U16 dest_port;

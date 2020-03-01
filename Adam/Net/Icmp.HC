@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 #define ICMP_TYPE_ECHO_REPLY      0
 #define ICMP_TYPE_ECHO_REQUEST    8
 

@@ -1,5 +1,3 @@
-// vim: set ft=cpp:
-
 #include "::/Adam/Net/Socket"
 #include "::/Adam/Net/UrlParse"
 

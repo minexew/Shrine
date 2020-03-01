@@ -1,5 +1,3 @@
-// vim: set ft=cpp:
-
 #define URL_EPARSE    (-201)
 #define URL_EPROTOCOL (-202)
 

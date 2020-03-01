@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 #define DNS_RCODE_NO_ERROR        0
 #define DNS_RCODE_FORMAT_ERROR    1
 #define DNS_RCODE_SERVER_FAILURE  2

@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 // Warning: terrible code ahead. this still needs a lot of work
 
 // In the future we'll probably have 2 FIFOs (pending frames & empty buffers)

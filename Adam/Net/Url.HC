@@ -1,5 +1,3 @@
-// vim: set ft=cpp:
-
 #include "::/Adam/Net/Http"
 
 I64 UrlGet(U8* url, U8** data_out = NULL, I64* size_out = NULL) {

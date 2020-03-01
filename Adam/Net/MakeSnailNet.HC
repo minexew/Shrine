@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 #exe {
   #include "::/Adam/HwSupp/Pci"
 

@@ -1,5 +1,3 @@
-// vim: set ft=c:
-
 #define IP_PROTO_ICMP           0x01
 #define IP_PROTO_TCP            0x06
 #define IP_PROTO_UDP            0x11
