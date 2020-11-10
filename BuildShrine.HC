@@ -26,7 +26,7 @@ if (DrvIsWritable)
   DirMk("/Tmp"); //Good to have a Tmp
 
 DirMk("/Home");
-Copy("/MakeHome.HC.Z", "/Home/MakeHome.HC.Z");
 
+DirMk("/0000Boot");
 #include "/Adam/Opt/Boot/MakeBoot"
 #include "/Misc/DoDistro"
