@@ -23,7 +23,7 @@ U0 TOSDbgDistro2()
 
 U0 TOSInit()
 {
-  switch (INS_REG_MACHINE_NUM) {
+  switch (0) {
     case 1: //TAD Native Machine
       DefinePrint("CFG_RAM_DRVS",
 	    "\"B\nScale2Mem(2048,0x100000,4*1024*1024*1024)\n\"");

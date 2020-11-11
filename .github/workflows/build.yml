@@ -17,4 +17,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: ShrineDist.ISO
-          path: .build/Shrine.out/Tmp/ShrineDist.ISO.C
+          path: .build/Shrine.out/Shrine.ISO

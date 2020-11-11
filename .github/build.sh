@@ -14,9 +14,9 @@ mkdir Shrine.out
 # workaround fs bug in HolyCRT (fails to create necessary directories)
 mkdir -p Shrine.out/Compiler Shrine.out/Kernel
 
-env STARTOS=BuildShrine ./$BIN --drive=C,..,Shrine.out
+env STARTOS=Build/BuildShrine ./$BIN --drive=C,..,Shrine.out
 
-ISO_FILE=Shrine.out/Tmp/ShrineDist.ISO.C
+ISO_FILE=Shrine.out/Shrine.ISO
 ISO_SIZE=$(wc -c <$ISO_FILE)
 MIN_SIZE=100000
 if [ $ISO_SIZE -le $MIN_SIZE ]; then
