@@ -1,15 +1,17 @@
 Shrine
 ======
 
+Shrine is a TempleOS distribution full of sin.
+
 ![Screenshot](http://imgur.com/1yYsUHI.png)
 
-Shrine is a TempleOS distribution that aims to be more modern & approachable.
+Shrine aims to be 99% compatible with TempleOS programs, but also to improve OS in several ways:
 
-Shrine aims to improve upon TempleOS in several aspects:
-- Approachability: Shrine ships with Lambda Shell, a more traditional Unix-like command interpreter
-- Connectivity: TCP/IP stack! Internet access!
-- Software access: Shrine includes a package downloader
-- Versatility: unlike stock TempleOS, Shrine requires only 64MB RAM, making it feasible for cloud micro-instances and similar setups (note: this is planned, but currently not true)
+- Ease of use: Shrine ships with Lambda Shell, which feels a bit like a classic Unix command interpreter
+- Connectivity: TCP/IP stack & internet access out of the box
+- Software discovery: Shrine includes a package downloader
+
+You can run Shrine in a virtual machine such as VirtualBox or [QEMU](QEMU.md), or on a machine compatible with standard TempleOS. Improvements in hardware support are planned and contributions are welcome.
 
 Software included in Shrine:
 - Mfa (minimalist file access)
@@ -17,27 +19,28 @@ Software included in Shrine:
 - Pkg (package downloader)
 - Wget
 
-Setting up with networking
-==========================
-- Native Stack (highly experimental)
-  - configure your VM networking: *Adapter Type: PCnet-PCI II* (QEMU: `-netdev user,id=u1 -device pcnet,netdev=u1`)
-  - *Attached to: NAT* seems to be the most reliable setting, Bridged Mode also works somewhat
-  - On boot, Shrine will automatically attempt to acquire an IP address. If you don't get a message about "Configuring network", the adapter was not detected.
+Networking & host-VM communication
+==================================
 
-- To enable tunelled networking through Snail:
+- With a virtual AMD PCNet adapter (recommended)
+  - configure your VM networking: *Adapter Type: PCnet-PCI II* (in QEMU: `-netdev user,id=u1 -device pcnet,netdev=u1`)
+  - *Attached to: NAT* seems to be the most reliable setting, Bridged Mode also works somewhat
+  - On boot, Shrine will automatically attempt to acquire an IP address. If you don't see a message about "Configuring network", the adapter was not detected.
+
+- Tunelled through serial port (Snail):
   - configure your VM: COM3 - TCP, server, 7777 (in VirtualBox, server = UNCHECK *Connect to existing*)
   - (make sure to *disable* networking for the VM, otherwise Native Stack will get precedence)
   - start the VM
   - run ./snail.py
   - you will now be able to access the Internet, try for example `pkg-list`
 
-- To enable file access through Mfa, configure the VM as follows:
+- File access through Mfa:
   - configure your VM: COM1 - TCP, server, 7770
   - start `/Apps/Mfa.HC.Z` in the VM
   - on the host, use ./mfa.py to transfer commands and files
   - for example: `./mfa.py list /Apps/Mfa.HC.Z Mfa.HC`
 
-Both of these can be used simultaneously.
+Networking and Mfa can be used simultaneously.
 
 Package management functions
 ============================
