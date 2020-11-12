@@ -9,7 +9,7 @@ Option(OPTf_WARN_DUP_TYPES,OFF);
   U8* native_driver = NULL;
   I64 b, d, f;
 
-  if (PciFindByID(0x1022, 0x2000, &b, &d, &f))
+  if (PciFindByID(0x1022, 0x2000, &b, &d, &f) || 1)
     native_driver = "PCNet";
 
   // If we're using the native stack, load it system-wide

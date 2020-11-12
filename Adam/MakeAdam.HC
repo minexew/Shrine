@@ -29,6 +29,5 @@ LBts(&sys_run_level,RLf_DOC);
 #include "WallPaper"
 #include "AMouse"
 #include "Host"
+#include "Net/MakeNet"
 Cd("..");;
-
-#include "::/Adam/Net/MakeSnailNet"
