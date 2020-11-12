@@ -135,6 +135,7 @@ U0 StdDistroPrep()
   CopyTree("C:/Compiler",TOS_DISTRO_DIR "/Compiler");
   CopyTree("C:/Demo",TOS_DISTRO_DIR "/Demo");
   CopyTree("C:/Doc",TOS_DISTRO_DIR "/Doc");
+  Zip(TOS_DISTRO_DIR "/Doc"); // issue #50 workaround
   CopyTree("C:/Downloads",TOS_DISTRO_DIR "/Downloads");
   DirMk(TOS_DISTRO_DIR "/Home");
   CopyTree("C:/Kernel",TOS_DISTRO_DIR "/Kernel");
