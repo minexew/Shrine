@@ -1,5 +1,3 @@
-// vim: set ft=cpp:
-
 #include "::/Adam/Net/Url"
 
 I64 Wget(U8* url, U8* saveas = NULL) {

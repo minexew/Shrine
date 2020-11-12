@@ -1,5 +1,3 @@
-// vim: set ft=cpp:
-
 #include "::/Adam/Net/Url"
 
 #define PKG_EURL        (-20001)

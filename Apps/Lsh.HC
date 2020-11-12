@@ -1,5 +1,3 @@
-// vim: set ft=cpp:
-
 #define LAMBDA_BITMAP 0x006336363C181B0E
 #define LAMBDA "\xFB"
 #define LAMBDA_CHARCODE 0xFB

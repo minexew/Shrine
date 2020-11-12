@@ -1,5 +1,3 @@
-// vim: set ft=cpp:
-
 #include "::/Doc/Comm"
 
 #define MFA_COM 1
