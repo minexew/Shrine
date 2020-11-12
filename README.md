@@ -1,9 +1,6 @@
-Shrine
-======
-
-Shrine is a TempleOS distribution full of sin.
-
-![Screenshot](http://imgur.com/1yYsUHI.png)
+<p align="center"><strong>Shrine</strong> is a TempleOS distribution full of sin.</p>
+<p align="center"><img alt="Screenshot" src="http://imgur.com/1yYsUHI.png"></p>
+<hr>
 
 Shrine aims to be 99% compatible with TempleOS programs, but also to improve OS in several ways:
 
