@@ -1,3 +1,8 @@
+// Changing the code to eliminate these warnings would harm reliability,
+// so suppress them instead.
+Option(OPTf_WARN_PAREN,OFF);
+Option(OPTf_WARN_DUP_TYPES,OFF);
+
 #exe {
   #include "::/Adam/HwSupp/Pci"
 
@@ -41,3 +46,6 @@
   else
     StreamPrint("U8* SNAILNET_NATIVE_DRIVER = NULL;\n", native_driver);
 }
+
+Option(OPTf_WARN_PAREN,ON);
+Option(OPTf_WARN_DUP_TYPES,ON);
