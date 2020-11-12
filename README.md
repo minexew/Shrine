@@ -58,7 +58,7 @@ Note: In Lsh, use `pkg-install xyz` in place of `PkgInstall("xyz")` etc.
 
 - `PkgMakeFromDir(U8* manifest_path, U8* src_dir);`
 
-  Build a package from directory contents. For an example manifest, check [here](Shrine/Packages/Lsh/manifest). Manifest must reference a valid .ISO.C path which will be used as **output**!
+  Build a package from directory contents. For an example manifest, check [here](https://github.com/minexew/Lsh/blob/master/Lsh.MF). Manifest must reference a valid .ISO.C path which will be used as **output**!
 
 - `PkgMakeFromFile(U8* manifest_path, U8* file_path);`
 
