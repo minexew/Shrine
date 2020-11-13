@@ -141,6 +141,7 @@ U0 StdDistroPrep()
   CopyTree("C:/Kernel",TOS_DISTRO_DIR "/Kernel");
   CopyTree("C:/Misc",TOS_DISTRO_DIR "/Misc");
   // CopyTree("C:/User",TOS_DISTRO_DIR "/User");
+  CopyTree("C:/Www",TOS_DISTRO_DIR "/Www");
   Copy("C:/HomeKeyPlugIns.HC", TOS_DISTRO_DIR "/");
   Copy("C:/HomeLocalize.HC", TOS_DISTRO_DIR "/");
   Copy("C:/HomeSys.HC", TOS_DISTRO_DIR "/");

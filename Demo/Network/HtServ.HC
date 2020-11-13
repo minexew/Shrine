@@ -40,6 +40,9 @@ U0 HtServProcess(CHtServSession* sess) {
     if (SERVER_STRING) {
       sendString(sess->sock, SERVER_STRING, 0);
     }
+
+    // TODO: how about some Content-Type??
+
     sendString(sess->sock, "\r\n", 0);
     sendall(sess->sock, data, size, 0);
     sess->state = STATE_TERM;
@@ -108,8 +111,15 @@ U0 HtServSession(CTcpSocket* sock) {
           }
 
           sess.protocol = StrNew(protocol);
-          // TODO: should urldecode
-          sess.resource = StrNew(resource);
+          
+          // FIXME: should urldecode resource
+          // FIXME: must check for trailing slash in general
+          if (!StrCmp(resource, "/")) {
+            sess.resource = StrNew("/Index.HTM");
+          }
+          else {
+            sess.resource = StrNew(resource);
+          }
 
           sess.state = STATE_HEADERS;
         }

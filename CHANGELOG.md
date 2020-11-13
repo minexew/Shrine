@@ -18,4 +18,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - TCP server mode is now usable (`close` doesn't abruptly terminate the connection)
 
-[Unreleased]: https://github.com/Shrine/compare/9317cf4f645a0072d5fa3f9abc466964d8baad4c...v5
+[Unreleased]: https://github.com/minexew/Shrine/compare/9317cf4f645a0072d5fa3f9abc466964d8baad4c...v5
