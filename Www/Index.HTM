@@ -67,6 +67,16 @@ hr {
       <h3>Connected and easy to use.</h3>
     </div>
     <hr>
+    <div style="text-align: center; font-style: italic;">
+      <exe>
+        if (HTTP_SERVER_STRING)
+          StreamPrint("%s<br>", HTTP_SERVER_STRING);
+
+        CDateStruct ds;
+        Date2Struct(&ds,Now+local_time_offset);
+        StreamPrint("Served on %02d/%02d %02d:%02d:%02d.", ds.mon, ds.day_of_mon, ds.hour, ds.min, ds.sec);
+      </exe>
+    </div>
   </div>
 </div>
 </body>
