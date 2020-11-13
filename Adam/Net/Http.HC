@@ -9,7 +9,7 @@
 #define HTTP_ECONTENTLENGTH (-106)
 
 #define HTTP_MAX_REDIRECTS  5
-#define HTTP_USER_AGENT "SnailNet ($TX+CX,"TempleOS",D="DD_OS_NAME_VERSION"$)"
+#define HTTP_USER_AGENT "Adam/Net/Http ($TX+CX,"TempleOS",D="DD_OS_NAME_VERSION"$)"
 
 /**
  * @param len_out (required) requires the content length, or -1 if unspecified

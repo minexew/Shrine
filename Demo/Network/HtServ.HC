@@ -6,7 +6,7 @@
 #define BASE_DIR "/Www"
 
 // Set to 0 if you don't want to print anything
-#define SERVER_STRING "Server: Shrine HtServ\r\n"
+#define SERVER_STRING "Server: HtServ ($TX+CX,"TempleOS",D="DD_OS_NAME_VERSION"$)\r\n"
 
 #define STATE_TERM 0
 #define STATE_NEW 1
