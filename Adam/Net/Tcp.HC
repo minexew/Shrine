@@ -522,7 +522,7 @@ I64 TcpSocketClose(CTcpSocket* s) {
 
   // Send FIN & wait for acknowledge
   if (s->state == TCP_STATE_ESTABLISHED) {
-    while (TcpSend2(s, TCP_FLAG_FIN) < 0) {
+    while (TcpSend2(s, TCP_FLAG_FIN | TCP_FLAG_ACK) < 0) {
       TcpSocketCheckSendBufs(s);
       Yield;
     }
