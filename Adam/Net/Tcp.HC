@@ -280,8 +280,22 @@ I64 TcpSend2(CTcpSocket* s, U8 flags) {
     s->snd_nxt++;
 
   //"Sent #%d, to %08X, err = %d\n", s->seq, s->remote_addr, error;
-  // FIXME: If the packet is SYN or FIN, we also need to queue for retransmit!
-  return TcpPacketFinish(index, s->local_addr, s->remote_addr, frame, 0, NULL);
+  if (flags & (TCP_FLAG_SYN | TCP_FLAG_FIN)) {
+    CTcpSendBufHeader* sb;
+    TcpPacketFinish(index, s->local_addr, s->remote_addr, frame, 0, &sb);
+    sb->seq_end = s->snd_nxt;
+
+    // Append to SendBuf chain
+    if (s->send_buf_first)
+      s->send_buf_last->next = sb;
+    else
+      s->send_buf_first = sb;
+
+    s->send_buf_last = sb;
+  }
+  else {
+    return TcpPacketFinish(index, s->local_addr, s->remote_addr, frame, 0, NULL);
+  }
 }
 
 // Send a TCP frame with flags and data
@@ -507,28 +521,53 @@ I64 TcpSocketClose(CTcpSocket* s) {
   */
 
   // Send FIN & wait for acknowledge
-  TcpSend2(s, TCP_FLAG_FIN);
-  s->state = TCP_STATE_FIN_WAIT_1;
-  // "FIN-WAIT-1\n";
+  if (s->state == TCP_STATE_ESTABLISHED) {
+    while (TcpSend2(s, TCP_FLAG_FIN) < 0) {
+      TcpSocketCheckSendBufs(s);
+      Yield;
+    }
 
-  // Block until all outgoing data including our FIN have been acknowledged (una == nxt)
-  //
-  // TODO: what other states are permissible here?
-  // TODO: this can block for ever if our receive buffer fills up, but the other side
-  //       insists on pushing more data before closing the connection
-  while ((s->state == TCP_STATE_ESTABLISHED || s->state == TCP_STATE_FIN_WAIT_1)
-      && s->snd_una != s->snd_nxt) {
-    TcpSocketCheckSendBufs(s);
-    Yield;
+    s->state = TCP_STATE_FIN_WAIT_1;
+    // "FIN-WAIT-1\n";
+
+    // Block until all outgoing data including our FIN have been acknowledged (una == nxt)
+    //
+    // TODO: what other states are permissible here?
+    // TODO: this can block for ever if our receive buffer fills up, but the other side
+    //       insists on pushing more data before closing the connection
+    while ((s->state == TCP_STATE_FIN_WAIT_1)
+        && s->snd_una != s->snd_nxt) {
+      TcpSocketCheckSendBufs(s);
+      Yield;
+    }
+
+    if (s->state == TCP_STATE_FIN_WAIT_1) {
+      s->state = TCP_STATE_FIN_WAIT_2;
+      // "FIN-WAIT-2 (%d/%d)\n", s->snd_una, s->snd_nxt;
+    }
+
+    // Now we should wait for the other side's FIN and acknowledge it
+    // TODO: time-out
+    while (s->state == TCP_STATE_FIN_WAIT_2) {
+      Yield;
+    }
   }
+  else if (s->state == TCP_STATE_CLOSE_WAIT) {
+    while (TcpSend2(s, TCP_FLAG_FIN | TCP_FLAG_ACK) < 0) {
+      TcpSocketCheckSendBufs(s);
+      Yield;
+    }
 
-  s->state = TCP_STATE_FIN_WAIT_2;
-  // "FIN-WAIT-2 (%d = %d)...\n", s->snd_una, s->snd_nxt;
+    if (s->state == TCP_STATE_CLOSE_WAIT) {
+      s->state = TCP_STATE_LAST_ACK;
+      // "LAST-ACK (%d/%d)\n", s->snd_una, s->snd_nxt;
+    }
 
-  // Now we should wait for the other side's FIN and acknowledge it
-  // TODO: time-out
-  while (s->state == TCP_STATE_FIN_WAIT_2) {
-    Yield;
+    // Block until all outgoing data including our FIN have been acknowledged (una == nxt)
+    while (s->state == TCP_STATE_LAST_ACK && s->snd_una != s->snd_nxt) {
+      TcpSocketCheckSendBufs(s);
+      Yield;
+    }
   }
 
   // Still connected? RST it!
