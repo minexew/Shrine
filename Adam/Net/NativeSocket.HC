@@ -8,6 +8,8 @@
 
 #define INADDR_ANY      0
 
+#define INET_ADDRSTRLEN 16
+
 #define NS_INADDRSZ     4
 
 #define SOL_SOCKET      1
@@ -89,11 +91,14 @@ I64 inet_pton(I64 af, U8 *src, U8 *dst) {
   return 1;
 }
 
-U8* inet_ntoa(in_addr in) {
-  static U8 buffer[16];
-  StrPrint(buffer, "%d.%d.%d.%d", in.s_addr & 0xff, (in.s_addr >> 8) & 0xff,
-      (in.s_addr >> 16) & 0xff, (in.s_addr >> 24) & 0xff);
-  return buffer;
+U8* inet_ntop(I64 af, U8* src, U8* dst, I64 size) {
+  if (af == AF_INET && size >= INET_ADDRSTRLEN) {
+    StrPrint(dst, "%d.%d.%d.%d", src[0], src[1], src[2], src[3]);
+    return dst;
+  }
+  else {
+    return 0;
+  }
 }
 
 class CSocket {

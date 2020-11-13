@@ -516,9 +516,10 @@ public U0 Host(U8* hostname) {
   else {
     addrinfo* curr = res;
     while (curr) {
+      U8 buffer[INET_ADDRSTRLEN];
       "flags %04Xh, family %d, socktype %d, proto %d, addrlen %d, addr %s\n",
           curr->ai_flags, curr->ai_family, curr->ai_socktype, curr->ai_protocol, curr->ai_addrlen,
-          inet_ntoa((curr->ai_addr(sockaddr_in*))->sin_addr);
+          inet_ntop(AF_INET, &(curr->ai_addr(sockaddr_in*))->sin_addr, buffer, sizeof(buffer));
       curr = curr->ai_next;
     }
   }

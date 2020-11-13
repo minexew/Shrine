@@ -29,6 +29,7 @@ I64 UdpListen() {
 
   while (1) {
     U8 buffer[2048 + 1];
+    U8 addr_buffer[INET_ADDRSTRLEN];
     I64 count = recvfrom(sock, buffer, sizeof(buffer) - 1, 0, &addr, sizeof(addr));
 
     if (count == 0)
@@ -40,8 +41,10 @@ I64 UdpListen() {
     else {
       buffer[count] = 0;
 
+      inet_ntop(addr.sin_family, &addr.sin_addr, addr_buffer, sizeof(addr_buffer));
+
       "$FG,8$Received %d bytes from %s:%d:\n$FG$%s\n", count,
-          inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), buffer;
+          addr_buffer, ntohs(addr.sin_port), buffer;
     }
   }
 

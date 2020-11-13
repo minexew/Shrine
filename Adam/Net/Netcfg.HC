@@ -116,7 +116,8 @@ I64 DhcpConfigure() {
   if (state == CLIENT_REQUEST_ACCEPTED) {
     in_addr in;
     in.s_addr = htonl(yiaddr);
-    "$FG,2$Obtained IP address %s\n$FG$", inet_ntoa(in);
+    U8 buffer[INET_ADDRSTRLEN];
+    "$FG,2$Obtained IP address %s\n$FG$", inet_ntop(AF_INET, &in.s_addr, buffer, sizeof(buffer));
     IPv4SetAddress(yiaddr);
     IPv4SetSubnet(router_ip, subnet_mask);
     DnsSetResolverIPv4(dns_ip);

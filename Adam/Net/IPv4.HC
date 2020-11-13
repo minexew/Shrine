@@ -132,7 +132,8 @@ static I64 GetEthernetAddressForIP(U32 ip, U8** mac_out) {
 
     in_addr in;
     in.s_addr = htonl(ip);
-    "$FG,6$IPv4: Failed to resolve address %s\n$FG$", inet_ntoa(in);
+    U8 buffer[INET_ADDRSTRLEN];
+    "$FG,6$IPv4: Failed to resolve address %s\n$FG$", inet_ntop(AF_INET, &in.s_addr, buffer, sizeof(buffer));
     return IPV4_EHOST_UNREACHABLE;
   }
 }
