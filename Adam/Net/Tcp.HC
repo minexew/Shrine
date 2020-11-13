@@ -449,7 +449,7 @@ I64 TcpSocketAccept(CTcpSocket* s, sockaddr* addr, I64 addrlen) {
     // TODO: Thread safe?
     if (s->backlog_first) {
       CTcpSocket* new_socket = s->backlog_first;
-      "Retr %p\n", new_socket;
+      // "Retr %p\n", new_socket;
 
       s->backlog_first = s->backlog_first->backlog_next;
       if (!s->backlog_first)
