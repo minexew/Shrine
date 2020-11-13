@@ -681,6 +681,8 @@ I64 TcpSocketRecvfrom(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr* src_
   return read_total;
 }
 
+// This function blocks until at least some data is sent.
+// Then it returns if the transmission window or outgoing buffers are full.
 I64 TcpSocketSendto(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr_in* dest_addr, I64 addrlen) {
   no_warn dest_addr;    // TODO: should be validated instead, no?
   no_warn addrlen;
@@ -700,6 +702,7 @@ I64 TcpSocketSendto(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr_in* des
       if (sent_total > 0)
         break;
       else {
+        // Check unacknowledged outgoing packets, re-transmit as needed
         TcpSocketCheckSendBufs(s);
         Yield;
       }
@@ -711,9 +714,21 @@ I64 TcpSocketSendto(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr_in* des
       if (can_send > s->mss)
         can_send = s->mss;
 
-      TcpSendData2(s, TCP_FLAG_ACK, buf, can_send);
-      buf += can_send;
-      len -= can_send;
+      if (TcpSendData2(s, TCP_FLAG_ACK, buf, can_send) < 0) {
+        // No out-buffers available! Handle in the same way as full window:
+        // stall until some of the outdoing data is acknowledged.
+        if (sent_total > 0)
+          break;
+        else {
+          // Check unacknowledged outgoing packets, re-transmit as needed
+          TcpSocketCheckSendBufs(s);
+          Yield;
+        }
+      }
+      else {
+        buf += can_send;
+        len -= can_send;
+      }
     }
   }
 
