@@ -16,7 +16,7 @@ I64 TcpEchoClient(U8* dest_address) {
   addr.sin_family = AF_INET;
   addr.sin_port = htons(PORT);
   addr.sin_addr.s_addr = 0;
-  inet_aton(dest_address, &addr.sin_addr);
+  inet_pton(addr.sin_family, dest_address, &addr.sin_addr);
 
   I64 error = connect(sock, &addr, sizeof(addr));
 

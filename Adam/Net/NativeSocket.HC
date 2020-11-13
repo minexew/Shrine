@@ -8,6 +8,8 @@
 
 #define INADDR_ANY      0
 
+#define NS_INADDRSZ     4
+
 #define SOL_SOCKET      1
 
 // optval = I64*
@@ -42,12 +44,49 @@ class addrinfo {
   addrinfo* ai_next;
 };
 
-I64 inet_aton(U8* cp, in_addr* inp) {
-  // FIXME: error handling
-  I64 a, b, c, d;
-  StrScan(cp, "%d.%d.%d.%d", &a, &b, &c, &d);
-  inp->s_addr = (a | (b << 8) | (c << 16) | (d << 24));
-  return 0;
+I64 inet_pton(I64 af, U8 *src, U8 *dst) {
+  I64 saw_digit, octets, ch;
+  U8 tmp[NS_INADDRSZ], *tp;
+
+  if (af != AF_INET) {
+    return -1;
+  }
+
+  saw_digit = 0;
+  octets = 0;
+  *(tp = tmp) = 0;
+  while (*src)
+    {
+      ch = *src++;
+      if (ch >= '0' && ch <= '9')
+        {
+          U64 new = *tp * 10 + (ch - '0');
+          if (saw_digit && *tp == 0)
+            return 0;
+          if (new > 255)
+            return 0;
+          *tp = new;
+          if (!saw_digit)
+            {
+              if (++octets > 4)
+                return 0;
+              saw_digit = 1;
+            }
+        }
+      else if (ch == '.' && saw_digit)
+        {
+          if (octets == 4)
+            return 0;
+          *++tp = 0;
+          saw_digit = 0;
+        }
+      else
+        return 0;
+    }
+  if (octets < 4)
+    return 0;
+  MemCpy(dst, tmp, NS_INADDRSZ);
+  return 1;
 }
 
 U8* inet_ntoa(in_addr in) {

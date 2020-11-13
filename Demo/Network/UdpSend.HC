@@ -18,7 +18,7 @@ I64 UdpSend(U8* dest_address) {
   addr.sin_family = AF_INET;
   addr.sin_port = htons(PORT);
   addr.sin_addr.s_addr = 0;
-  inet_aton(dest_address, &addr.sin_addr);
+  inet_pton(addr.sin_family, dest_address, &addr.sin_addr);
 
   U8* message = "hello, world!";
   I64 count = sendto(sock, message, StrLen(message), 0, &addr, sizeof(addr));
