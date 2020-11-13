@@ -250,6 +250,7 @@ I64 TcpPacketFinish(I64 index, U32 source_ip, U32 dest_ip, U8* frame, I64 length
   return IPv4PacketFinish(index);
 }
 
+// Send a TCP frame with flags and/or data
 I64 TcpSend(U32 local_addr, U16 local_port, U32 remote_addr, U16 remote_port, U32 seq, U32 ack, U8 flags) {
   U8* frame;
   I64 index = TcpPacketAlloc(&frame,
@@ -262,6 +263,7 @@ I64 TcpSend(U32 local_addr, U16 local_port, U32 remote_addr, U16 remote_port, U3
   return TcpPacketFinish(index, local_addr, remote_addr, frame, 0, NULL);
 }
 
+// Send a TCP frame with flags only, no data
 I64 TcpSend2(CTcpSocket* s, U8 flags) {
   U8* frame;
   I64 index = TcpPacketAlloc(&frame,
@@ -282,6 +284,7 @@ I64 TcpSend2(CTcpSocket* s, U8 flags) {
   return TcpPacketFinish(index, s->local_addr, s->remote_addr, frame, 0, NULL);
 }
 
+// Send a TCP frame with flags and data
 I64 TcpSendData2(CTcpSocket* s, U8 flags, U8* data, I64 length) {
   U8* frame;
   I64 index = TcpPacketAlloc(&frame,
@@ -292,7 +295,7 @@ I64 TcpSendData2(CTcpSocket* s, U8 flags, U8* data, I64 length) {
     return index;
 
   if (length)
-  MemCpy(frame, data, length);
+    MemCpy(frame, data, length);
 
   if (flags & TCP_FLAG_SYN)
     s->snd_nxt++;
@@ -382,6 +385,7 @@ static U0 TcpSocketAckSendBufs(CTcpSocket* s, U32 seg_ack) {
   }
 }
 
+// Check unacknowledged outgoing packets and retransmit if needed
 static U0 TcpSocketCheckSendBufs(CTcpSocket* s) {
   F64 time = tS;
 
@@ -489,6 +493,45 @@ I64 TcpSocketBind(CTcpSocket* s, sockaddr* addr, I64 addrlen) {
 }
 
 I64 TcpSocketClose(CTcpSocket* s) {
+  /* https://tools.ietf.org/html/rfc793#section-3.5
+    Case 1:  Local user initiates the close
+
+    In this case, a FIN segment can be constructed and placed on the
+    outgoing segment queue.  No further SENDs from the user will be
+    accepted by the TCP, and it enters the FIN-WAIT-1 state.  RECEIVEs
+    are allowed in this state.  All segments preceding and including FIN
+    will be retransmitted until acknowledged.  When the other TCP has
+    both acknowledged the FIN and sent a FIN of its own, the first TCP
+    can ACK this FIN.  Note that a TCP receiving a FIN will ACK but not
+    send its own FIN until its user has CLOSED the connection also.
+  */
+
+  // Send FIN & wait for acknowledge
+  TcpSend2(s, TCP_FLAG_FIN);
+  s->state = TCP_STATE_FIN_WAIT_1;
+  // "FIN-WAIT-1\n";
+
+  // Block until all outgoing data including our FIN have been acknowledged (una == nxt)
+  //
+  // TODO: what other states are permissible here?
+  // TODO: this can block for ever if our receive buffer fills up, but the other side
+  //       insists on pushing more data before closing the connection
+  while ((s->state == TCP_STATE_ESTABLISHED || s->state == TCP_STATE_FIN_WAIT_1)
+      && s->snd_una != s->snd_nxt) {
+    TcpSocketCheckSendBufs(s);
+    Yield;
+  }
+
+  s->state = TCP_STATE_FIN_WAIT_2;
+  // "FIN-WAIT-2 (%d = %d)...\n", s->snd_una, s->snd_nxt;
+
+  // Now we should wait for the other side's FIN and acknowledge it
+  // TODO: time-out
+  while (s->state == TCP_STATE_FIN_WAIT_2) {
+    Yield;
+  }
+
+  // Still connected? RST it!
   if (TcpIsSynchronizedState(s->state)) {
     TcpSend2(s, TCP_FLAG_RST);
   }
@@ -581,14 +624,18 @@ I64 TcpSocketRecvfrom(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr* src_
   no_warn src_addr;   // FIXME
   no_warn addrlen;
   //"TcpSocketRecvfrom\n";
-  while (s->state == TCP_STATE_ESTABLISHED && s->recv_buf_read_pos == s->recv_buf_write_pos) {
+  // If we are ready to receive data, but there is none currently, block until we receive is some.
+  // TODO: checking for FIN-WAIT-1 here is not so useful, since it only exists while we are in Close()
+  while ((s->state == TCP_STATE_ESTABLISHED || s->state == TCP_STATE_FIN_WAIT_1)
+      && s->recv_buf_read_pos == s->recv_buf_write_pos) {
     TcpSocketCheckSendBufs(s);
     Yield;
   }
 
   // TODO: this works for now, but we should be still able to receive data
   //       in connection-closing states
-  if ((s->state != TCP_STATE_ESTABLISHED && s->recv_buf_read_pos == s->recv_buf_write_pos)
+  if (((s->state != TCP_STATE_ESTABLISHED || s->state == TCP_STATE_FIN_WAIT_1)
+      && s->recv_buf_read_pos == s->recv_buf_write_pos)
       || len == 0)
     return 0;
 
@@ -635,13 +682,13 @@ I64 TcpSocketRecvfrom(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr* src_
 }
 
 I64 TcpSocketSendto(CTcpSocket* s, U8* buf, I64 len, I64 flags, sockaddr_in* dest_addr, I64 addrlen) {
-  no_warn dest_addr;
+  no_warn dest_addr;    // TODO: should be validated instead, no?
   no_warn addrlen;
   no_warn flags;
 
   I64 sent_total = 0;
 
-  while (s->state == TCP_STATE_ESTABLISHED && len) {
+  while ((s->state == TCP_STATE_ESTABLISHED || s->state == TCP_STATE_CLOSE_WAIT) && len) {
     I64 can_send = (s->snd_una + s->snd_wnd - s->snd_nxt) & 0xffffffff;
 
     // TODO: Keep trying
@@ -890,7 +937,7 @@ U0 TcpSocketHandle(CTcpSocket* s, CIPv4Packet* packet, CTcpHeader* hdr, U8* data
   if (valid_seq) {
     s->snd_wnd = hdr->window_size;
 
-    if (s->state == TCP_STATE_ESTABLISHED) {
+    if (s->state == TCP_STATE_ESTABLISHED || s->state == TCP_STATE_FIN_WAIT_1) {
       I64 write_pos = s->recv_buf_write_pos;
       //"%d in @ %d", length, write_pos;
 
@@ -921,9 +968,16 @@ U0 TcpSocketHandle(CTcpSocket* s, CIPv4Packet* packet, CTcpHeader* hdr, U8* data
         must_ack = TRUE;
 
       if (hdr->flags & TCP_FLAG_FIN) {
-        s->rcv_nxt++;
-        s->state = TCP_STATE_CLOSE_WAIT;
         must_ack = TRUE;
+        s->rcv_nxt++;
+
+        if (s->state == TCP_STATE_ESTABLISHED) {
+          s->state = TCP_STATE_CLOSE_WAIT;
+        }
+        else if (s->state == TCP_STATE_FIN_WAIT_1 || s->state == TCP_STATE_FIN_WAIT_2) {
+          s->state = TCP_STATE_TIME_WAIT;
+        }
+        //else { ?? }
       }
     }
   }
