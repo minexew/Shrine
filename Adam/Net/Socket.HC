@@ -22,6 +22,23 @@ I64 recvLine(I64 sock, U8* buffer, I64 size, I64 flags) {
   return got;
 }
 
+I64 sendall(I64 sockfd, U8* buf, I64 len, I64 flags) {
+  I64 total = 0;
+
+  while (len) {
+    I64 sent = send(sockfd, buf, len, flags);
+    if (sent > 0) {
+      buf += sent;
+      total += sent;
+      len -= sent;
+    }
+    else
+      break;
+  }
+
+  return total;
+}
+
 I64 sendString(I64 sockfd, U8* str, I64 flags) {
-  return send(sockfd, str, StrLen(str), flags);
+  return sendall(sockfd, str, StrLen(str), flags);
 }
